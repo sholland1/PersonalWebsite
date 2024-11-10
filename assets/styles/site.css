@@ -1,0 +1,225 @@
+:root {
+  /*--header-image: url('../images/wp.jpeg');*/
+  --body-bg-image: url('../images/poolside-fm-lost-in-tripoli-sail.gif');
+  --cursor-image: url('../images/cursor.gif');
+  /*--bar-image: url('../images/bar.png');*/
+  --bullet-image: url('../images/bullet.gif');
+
+  --color-dark-red: #B5575B;
+  --color-mustard-yellow: #AAB1B2;
+  --color-black: #442122;
+  --color-white: #F2E4CD;
+  --color-dark-gray: #3F3943;
+
+  --body-bg: var(--color-black);
+  --header-bg: var(--color-dark-gray);
+  --box-bg: var(--color-white);
+
+  --content: var(--color-dark-gray);
+  --text-color: var(--color-white);
+  --link-color: var(--color-dark-red);
+  --sidebar-bg: var(--color-dark-gray);
+  --footer-bg: var(--color-dark-gray);
+  --border-color: var(--color-mustard-yellow);
+
+  --big-text-color: var(--color-mustard-yellow);
+  --box-text-color: var(--color-dark-gray);
+  --highlight-color: var(--color-dark-red);
+}
+
+::selection {
+  color: var(--color-white);
+  background-color: var(--highlight-color);
+}
+
+@font-face {
+  font-family: HeaderFont;
+  src: url('../fonts/Vollkorn-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: SubHeaderFont;
+  src: url('../fonts/AlegreyaSC-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: BodyFont;
+  src: url('../fonts/Roboto-Regular.ttf') format('truetype');
+}
+
+body {
+  font-family: 'BodyFont', sans-serif;
+  margin: 0;
+  background-color: var(--body-bg);
+  /* you can delete the line below if you'd prefer to not use an image */
+  /*background-size: 65px;*/
+  color: var(--text-color);
+  background-image: var(--body-bg-image);
+  background-attachment: fixed;
+  cursor: var(--cursor-image), auto;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+ul {
+  list-style-image: var(--bullet-image);
+}
+
+/* below this line is CSS for the layout */
+
+/* the "container" is what wraps your entire website */
+/* if you want something (like the header) to be Wider than
+the other elements, you will need to move that div outside
+of the container */
+#container {
+  max-width: 900px;
+  /* this is the width of your layout! */
+  /* if you change the above value, scroll to the bottom
+and change the media query according to the comment! */
+  margin: 0 auto;
+  /* this centers the entire page */
+}
+
+/* the area below is for all links on your page
+EXCEPT for the navigation */
+#container a {
+  color: var(--link-color);
+  font-weight: bold;
+  /* if you want to remove the underline
+you can add a line below here that says:
+text-decoration:none; */
+}
+
+#header {
+  width: 100%;
+  background-color: var(--header-bg);
+  height: 150px;
+  background-image: var(--header-image);
+  background-size: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+#flex {
+  display: flex;
+}
+
+/* this colors BOTH sidebars
+if you want to style them separately,
+create styles for #leftSidebar and #rightSidebar */
+aside {
+  background-color: var(--sidebar-bg);
+  width: 240px;
+  padding: 20px;
+  font-size: smaller;
+  border: 1px solid var(--border-color);
+  background-image: var(--bar-image);
+  background-repeat: repeat-x;
+  /* this makes the sidebar text slightly smaller */
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+
+/* this is the color of the main content area,
+between the sidebars! */
+main {
+  background-color: var(--content);
+  flex: 1;
+  padding: 20px;
+  order: 2;
+  border: 1px solid var(--border-color);
+  background-image: var(--bar-image);
+  background-repeat: repeat-x;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* what's this "order" stuff about??
+allow me to explain!
+if you're using both sidebars, the "order" value
+tells the CSS the order in which to display them.
+left sidebar is 1, content is 2, and right sidebar is 3! */
+
+#leftSidebar {
+  order: 1;
+}
+
+footer {
+  background-color: var(--footer-bg);
+  /* background color for footer */
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  /* this centers the footer text */
+  font-family: 'HeaderFont', sans-serif;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+  color: var(--big-text-color);
+  font-family: 'HeaderFont', sans-serif;
+}
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--big-text-color);
+  font-family: 'SubHeaderFont', sans-serif;
+}
+
+h1 {
+  font-size: 55px;
+}
+
+strong {
+  /* this styles bold text */
+  color: var(--big-text-color);
+}
+
+/* this is just a cool box, it's the darker colored one */
+.box {
+  color: var(--box-text-color);
+  background-color: var(--box-bg);
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* BELOW THIS POINT IS MEDIA QUERY */
+
+/* so you wanna change the width of your page?
+by default, the container width is 900px.
+in order to keep things responsive, take your new height,
+and then subtrack it by 100. use this new number as the
+"max-width" value below
+*/
+
+@media only screen and (max-width: 800px) {
+  #flex {
+    flex-wrap: wrap;
+  }
+
+  aside {
+    width: 100%;
+  }
+
+  /* the order of the items is adjusted here for responsiveness!
+since the sidebars would be too small on a mobile device.
+feel free to play around with the order!
+*/
+  main {
+    order: 1;
+  }
+
+  #leftSidebar {
+    order: 2;
+  }
+}

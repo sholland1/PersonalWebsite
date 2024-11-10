@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dumb Site - {{title}}</title>
+  <base href="file:///home/sholland/Projects/PersonalWebsite/output/">
+  <link rel="icon" type="image/x-icon" href="assets/images/favicon.gif">
+  <link rel="stylesheet" href="assets/styles/site.css">
+
+  <style>
+    pre.has-highlighted span.highlighted {
+      text-decoration: underline wavy;
+      text-underline-offset: 3px;
+    }
+
+    pre.has-highlighted span.highlighted.error { text-decoration-color: #B5575B; }
+    pre.has-highlighted span.highlighted.warning { text-decoration-color: #F2E4CD; }
+
+    pre.has-focused .line:not(.focused) {
+      filter: blur(2px);
+      transition: filter 0.3s ease;
+    }
+    pre.has-focused:hover .line:not(.focused) { filter: blur(0); }
+
+    pre.has-diff span.diff { background-color: green; }
+    pre.has-diff span.diff.remove { background-color: red; }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <a href="index.html">
+      <div id="header" style="margin-top: 10px; margin-bottom: 10px; height: 170px;">
+        <h1>My Dumb Site</h1>
+      </div>
+    </a>
+
+    <div id="headerArea">
+    </div>
+
+    <div id="flex">
+      <aside id="leftSidebar" style="margin-right: 10px;">
+        <nav>
+          <ul>
+            <li>Blogs</li>
+            <ul>
+              <li>Blog 1</li>
+              <li>Blog 2</li>
+            </ul>
+
+            <li>Game Rankings</li>
+            <ul>
+              <li>Zelda</li>
+              <li>Metroid</li>
+              <li>Xenoblade</li>
+              <li>Pokémon</li>
+            </ul>
+
+            <li>Lifting</li>
+            <li>Quotes</li>
+          </ul>
+        </nav>
+
+        <h2>Box</h2>
+        <div class="box">
+          <p>lorum ipsum</p>
+        </div>
+      </aside>
+
+      <main>
+          <h2>{{title}}</h2>
+          {{#if date_published}}
+          <p>Date Published: {{date_published}}</p>
+          {{/if}}
+          {{#if date_updated}}
+          <p>Last Updated: {{date_updated}}</p>
+          {{/if}}
+{{{content}}}
+      </main>
+
+    </div>
+    <footer id="footer" style="margin-top: 10px; margin-bottom: 10px;">Copyright &copy; 2024 Seth Holland. All Rights Reserved.</footer>
+  </div>
+</body>
+
