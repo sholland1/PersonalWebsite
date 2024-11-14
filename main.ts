@@ -19,6 +19,7 @@ await copy("assets", `${OUTPUT_DIR}/assets`);
 
 await processBlogFiles();
 await processRankingsFiles();
+await processQuotesFile();
 
 async function processBlogFiles() {
     const files = await Array.fromAsync(expandGlob("pages/**/*.html"));
@@ -76,7 +77,7 @@ async function processRankingsFiles() {
         const fileInfo = await Deno.stat(file.path);
         const params = {
             title: `My Ranking of the ${file.name.replace('.txt', '').replace('Rankings', '')} Games`,
-            date_updated: fileInfo.mtime?.toISOString().split('T')[0] || "",
+            date_updated: getModifiedDate(fileInfo),
             content: `<ol>${lines.map(line => `<li>${line.trim()}</li>`).join('\n')}</ol>`,
         };
 
@@ -84,6 +85,25 @@ async function processRankingsFiles() {
         const outputFilename = `${OUTPUT_DIR}/game-rankings/${file.name.replace('.txt', '.html')}`;
         await Deno.writeTextFile(outputFilename, template(params));
     }
+}
+
+async function processQuotesFile() {
+    const quoteFile = `${NOTES_DIR}/Quotes.txt`;
+    const quotesText = await Deno.readTextFile(quoteFile);
+    const lines = quotesText.split('\n').filter(line => line.trim() !== '');
+    const fileInfo = await Deno.stat(quoteFile);
+    const params = {
+        title: 'Quotes',
+        date_updated: getModifiedDate(fileInfo),
+        content: `<div>${lines.map(line => `<p>${line.trim()}</p>`).join('\n')}</div>`,
+    };
+
+    const outputFilename = `${OUTPUT_DIR}/quotes.html`;
+    await Deno.writeTextFile(outputFilename, template(params));
+}
+
+function getModifiedDate(fileInfo: Deno.FileInfo) {
+  return fileInfo.mtime?.toISOString().split('T')[0] || "";
 }
 
 async function highlightCodeBlocks(content: string): Promise<string> {
