@@ -14,27 +14,86 @@ const NOTES_DIR = "../../OneDrive/Documents/Notes"
 const templateText = await Deno.readTextFile("template.html");
 const template = Handlebars.compile(templateText);
 
-await emptyDir(OUTPUT_DIR);
-await copy("assets", `${OUTPUT_DIR}/assets`);
+console.log("Creating basic site...");
+const blogParams = processBlogFiles("pages/blog/*.html");
+const topLevelParams = processBlogFiles("pages/*.html");
+const rankingsParams = processRankingsFiles();
+const quotesParams = processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
 
-await processBlogFiles();
-await processRankingsFiles();
-await processQuotesFile();
+const siteParams = {
+    Blog: await Array.fromAsync(blogParams),
+    GameRankings: await Array.fromAsync(rankingsParams),
+    TopLevel: [await quotesParams, ...await Array.fromAsync(topLevelParams)],
+};
 
-async function processBlogFiles() {
-    const files = await Array.fromAsync(expandGlob("pages/**/*.html"));
-    for (const file of files) {
-        const articleText = await Deno.readTextFile(file.path);
-        const params = await parseBlog(articleText);
-
-        const relativePath = file.path.replace(/^.*?pages/, '').replace(/^\//, '');
-        const outputFilename = `${OUTPUT_DIR}/${relativePath}`;
-        await ensureDir(outputFilename.substring(0, outputFilename.lastIndexOf('/')));
-        await Deno.writeTextFile(outputFilename, template(params));
+for (const [key, arr] of Object.entries(siteParams)) {
+    console.log(`Processing ${key}`);
+    for (const params of arr) {
+        console.log(`  Processing ${params.path}`);
     }
 }
 
-async function parseBlog(articleText: string) {
+console.log("Creating nav...");
+const navHtml = generateNavHtml(siteParams).join('\n');
+// console.log(navHtml);
+
+console.log("Emptying output directory...");
+await emptyDir(OUTPUT_DIR);
+
+console.log("Adding nav to template...");
+
+const allParams = [...siteParams.Blog, ...siteParams.GameRankings, ...siteParams.TopLevel].map(params => ({
+    ...params,
+    nav_content: navHtml,
+    current_year: new Date().getFullYear(),
+}));
+
+// console.log(allParams)
+
+for (const params of allParams) {
+    console.log(`Processing ${params.path}`);
+    const outputFilename = `${OUTPUT_DIR}/${params.path}`;
+    await ensureDir(outputFilename.substring(0, outputFilename.lastIndexOf('/')));
+    await Deno.writeTextFile(outputFilename, template(params));
+}
+
+console.log("Copying assets...");
+await copy("assets", `${OUTPUT_DIR}/assets`);
+
+function generateNavHtml(siteParams): string[] {
+    const parts = ['<ul>'];
+    parts.push('<li><a href="blog/index.html">Blog</a><ul>')
+    for (const blog of siteParams.Blog) {
+        const formattedTitle = blog.title.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        parts.push(`<li><a href="${blog.path}">${formattedTitle}</a></li>`);
+    }
+    parts.push('</ul>');
+
+    parts.push('<li><a href="game-rankings/index.html">Game Rankings</a><ul>')
+    for (const ranking of siteParams.GameRankings) {
+        const linkText = ranking.path.split('/').pop()?.replace('.html', '');
+        parts.push(`<li><a href="${ranking.path}">${linkText}</a></li>`);
+    }
+    parts.push('</ul>');
+
+    for (const other of siteParams.TopLevel) {
+        const formattedTitle = other.title.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        parts.push(`<li><a href="${other.path}">${formattedTitle}</a></li>`);
+    }
+    parts.push('</ul>');
+    return parts;
+}
+
+async function* processBlogFiles(glob: string) {
+    const files = await Array.fromAsync(expandGlob(glob));
+    for (const file of files) {
+        const articleText = await Deno.readTextFile(file.path);
+        const relativePath = file.path.replace(/^.*?pages/, '').replace(/^\//, '');
+        yield await parseBlog(articleText, relativePath);
+    }
+}
+
+async function parseBlog(articleText: string, path: string) {
     /* Format of Blog
 <!--
 title: Blog 1
@@ -66,40 +125,36 @@ tags: a, b, c
         date_updated: metadata.date_updated || null,
         tags: metadata.tags ? metadata.tags.split(',').map(tag => tag.trim()) : [],
         content: await highlightCodeBlocks(lines.slice(contentStartIndex).join('\n').trim()),
+        path: path,
     };
 }
 
-async function processRankingsFiles() {
+async function* processRankingsFiles() {
     const files = await Array.fromAsync(expandGlob(`${NOTES_DIR}/*Rankings.txt`));
     for (const file of files) {
         const rankingText = await Deno.readTextFile(file.path);
         const lines = rankingText.split('\n').filter(line => line.trim() !== '');
         const fileInfo = await Deno.stat(file.path);
-        const params = {
+        yield {
             title: `My Ranking of the ${file.name.replace('.txt', '').replace('Rankings', '')} Games`,
             date_updated: getModifiedDate(fileInfo),
             content: `<ol>${lines.map(line => `<li>${line.trim()}</li>`).join('\n')}</ol>`,
+            path: `game-rankings/${file.name.replace('Rankings.txt', '.html')}`,
         };
 
-        await ensureDir(`${OUTPUT_DIR}/game-rankings`);
-        const outputFilename = `${OUTPUT_DIR}/game-rankings/${file.name.replace('.txt', '.html')}`;
-        await Deno.writeTextFile(outputFilename, template(params));
     }
 }
 
-async function processQuotesFile() {
-    const quoteFile = `${NOTES_DIR}/Quotes.txt`;
-    const quotesText = await Deno.readTextFile(quoteFile);
+async function processQuotesFile(quotesFile: string) {
+    const quotesText = await Deno.readTextFile(quotesFile);
     const lines = quotesText.split('\n').filter(line => line.trim() !== '');
-    const fileInfo = await Deno.stat(quoteFile);
-    const params = {
+    const fileInfo = await Deno.stat(quotesFile);
+    return {
         title: 'Quotes',
         date_updated: getModifiedDate(fileInfo),
         content: `<div>${lines.map(line => `<p>${line.trim()}</p>`).join('\n')}</div>`,
+        path: 'quotes.html',
     };
-
-    const outputFilename = `${OUTPUT_DIR}/quotes.html`;
-    await Deno.writeTextFile(outputFilename, template(params));
 }
 
 function getModifiedDate(fileInfo: Deno.FileInfo) {

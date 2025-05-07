@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Dumb Site - {{title}}</title>
-  <base href="file:///home/sholland/Projects/PersonalWebsite/output/">
+  <title>My Dumb Site — {{title}}</title>
+  <!-- <base href="file:///home/sholland/Projects/PersonalWebsite/output/"> -->
+  <base href="http://localhost:8000/output">
   <link rel="icon" type="image/x-icon" href="assets/images/favicon.gif">
   <link rel="stylesheet" href="assets/styles/site.css">
 
@@ -42,24 +43,7 @@
     <div id="flex">
       <aside id="leftSidebar" style="margin-right: 10px;">
         <nav>
-          <ul>
-            <li>Blogs</li>
-            <ul>
-              <li>Blog 1</li>
-              <li>Blog 2</li>
-            </ul>
-
-            <li>Game Rankings</li>
-            <ul>
-              <li>Zelda</li>
-              <li>Metroid</li>
-              <li>Xenoblade</li>
-              <li>Pokémon</li>
-            </ul>
-
-            <li>Lifting</li>
-            <li>Quotes</li>
-          </ul>
+          {{{nav_content}}}
         </nav>
 
         <h2>Box</h2>
@@ -80,7 +64,7 @@
       </main>
 
     </div>
-    <footer id="footer" style="margin-top: 10px; margin-bottom: 10px;">Copyright &copy; 2024 Seth Holland. All Rights Reserved.</footer>
+    <footer id="footer" style="margin-top: 10px; margin-bottom: 10px;">Copyright &copy; {{{current_year}}} Seth Holland. All Rights Reserved.</footer>
   </div>
 </body>
 
