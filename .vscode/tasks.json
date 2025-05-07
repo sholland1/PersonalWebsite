@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {// serve the site using deno on localhost:8000
+            "label": "serve",
+            "type": "shell",
+            "command": "/usr/bin/deno",
+            "args": [
+            "run",
+            "--allow-all",
+            "https://deno.land/std@0.177.0/http/file_server.ts",
+            "--port",
+            "8000"
+            ],
+            "options": {
+            "cwd": "${workspaceFolder}/output"
+            },
+            "dependsOn": ["run"],
+            "problemMatcher": []
+        },
+        {// run main
+            "label": "run",
+            "type": "shell",
+            "command": "/usr/bin/deno",
+            "args": [
+                "run",
+                "--allow-all",
+                "${workspaceFolder}/main.ts"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+        }
+    ]
+}
