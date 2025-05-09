@@ -18,6 +18,7 @@
   --content: var(--color-dark-gray);
   --text-color: var(--color-white);
   --link-color: var(--color-dark-red);
+  --visited-link-color: var(--color-mustard-yellow);
   --sidebar-bg: var(--color-dark-gray);
   --footer-bg: var(--color-dark-gray);
   --border-color: var(--color-mustard-yellow);
@@ -64,6 +65,10 @@ body {
   background-image: var(--body-bg-image);
   background-attachment: fixed;
   cursor: var(--cursor-image), auto;
+
+  a {
+    color: var(--link-color);
+  }
 }
 
 ul {
@@ -103,7 +108,9 @@ ul {
   margin-bottom: 1em;
 
   a {
-    color: var(--link-color);
+    &:visited {
+      color: var(--visited-link-color);
+    }
     font-weight: bold;
   }
 }
