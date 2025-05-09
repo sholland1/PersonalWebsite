@@ -10,9 +10,7 @@ import { codeToHtml } from "npm:shiki";
 
 const OUTPUT_DIR = "output";
 const NOTES_DIR = "../../OneDrive/Documents/Notes"
-
-const templateText = await Deno.readTextFile("template.html");
-const template = Handlebars.compile(templateText);
+const TEMPLATE_FILE = "template.html";
 
 console.log("Creating basic site...");
 const blogParams = processBlogFiles("pages/blog/*.html");
@@ -49,6 +47,9 @@ const allParams = [...siteParams.Blog, ...siteParams.GameRankings, ...siteParams
 }));
 
 // console.log(allParams)
+
+const templateText = await Deno.readTextFile(TEMPLATE_FILE);
+const template = Handlebars.compile(templateText);
 
 for (const params of allParams) {
     console.log(`Processing ${params.path}`);
@@ -139,6 +140,7 @@ async function* processRankingsFiles() {
             title: `My Ranking of the ${file.name.replace('.txt', '').replace('Rankings', '')} Games`,
             date_updated: getModifiedDate(fileInfo),
             content: `<ol>${lines.map(line => `<li>${line.trim()}</li>`).join('\n')}</ol>`,
+            tags: ['fun'],
             path: `game-rankings/${file.name.replace('Rankings.txt', '.html')}`,
         };
 
@@ -153,6 +155,7 @@ async function processQuotesFile(quotesFile: string) {
         title: 'Quotes',
         date_updated: getModifiedDate(fileInfo),
         content: `<div>${lines.map(line => `<p>${line.trim()}</p>`).join('\n')}</div>`,
+        tags: ['fun'],
         path: 'quotes.html',
     };
 }
