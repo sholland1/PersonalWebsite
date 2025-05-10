@@ -13,15 +13,15 @@ const NOTES_DIR = "../../OneDrive/Documents/Notes"
 const TEMPLATE_FILE = "template.html";
 
 console.log("Creating basic site...");
-const blogParams = processBlogFiles("pages/blog/*.html");
-const topLevelParams = processBlogFiles("pages/*.html");
-const rankingsParams = processRankingsFiles();
-const quotesParams = processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
+const blogParams = await Array.fromAsync(processBlogFiles("pages/blog/*.html"));
+const topLevelParams = await Array.fromAsync(processBlogFiles("pages/*.html"));
+const rankingsParams = await Array.fromAsync(processRankingsFiles());
+const quotesParams = await processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
 
-const siteParams = {
-    Blog: await Array.fromAsync(blogParams),
-    GameRankings: await Array.fromAsync(rankingsParams),
-    TopLevel: [await quotesParams, ...await Array.fromAsync(topLevelParams)],
+const siteParams: SiteParams = {
+    Blog: blogParams,
+    GameRankings: rankingsParams,
+    TopLevel: [quotesParams, ...topLevelParams],
 };
 
 for (const [key, arr] of Object.entries(siteParams)) {
@@ -52,7 +52,7 @@ const templateText = await Deno.readTextFile(TEMPLATE_FILE);
 const template = Handlebars.compile(templateText);
 
 for (const params of allParams) {
-    console.log(`Processing ${params.path}`);
+    console.log(`Generating ${params.path}`);
     const outputFilename = `${OUTPUT_DIR}/${params.path}`;
     await ensureDir(outputFilename.substring(0, outputFilename.lastIndexOf('/')));
     await Deno.writeTextFile(outputFilename, template(params));
@@ -61,7 +61,13 @@ for (const params of allParams) {
 console.log("Copying assets...");
 await copy("assets", `${OUTPUT_DIR}/assets`);
 
-function generateNavHtml(siteParams): string[] {
+interface SiteParams {
+    Blog: Array<{ path: string; title: string }>;
+    GameRankings: Array<{ path: string }>;
+    TopLevel: Array<{ path: string; title: string }>;
+}
+
+function generateNavHtml(siteParams: SiteParams): string[] {
     const parts = ['<ul>'];
     parts.push('<li><a href="blog/index.html">Blog</a><ul>')
     for (const blog of siteParams.Blog) {
@@ -90,12 +96,12 @@ async function* processBlogFiles(glob: string) {
     for (const file of files) {
         const articleText = await Deno.readTextFile(file.path);
         const relativePath = file.path.replace(/^.*?pages/, '').replace(/^\//, '');
-        yield await parseBlog(articleText, relativePath);
+        yield await parseArticle(articleText, relativePath);
     }
 }
 
-async function parseBlog(articleText: string, path: string) {
-    /* Format of Blog
+async function parseArticle(articleText: string, path: string) {
+    /* Format of Article
 <!--
 title: Blog 1
 date_published: 2024-10-08 (optional)
@@ -126,7 +132,7 @@ tags: a, b, c
         date_updated: metadata.date_updated || null,
         tags: metadata.tags ? metadata.tags.split(',').map(tag => tag.trim()) : [],
         content: await highlightCodeBlocks(lines.slice(contentStartIndex).join('\n').trim()),
-        path: path,
+        path,
     };
 }
 
@@ -161,7 +167,7 @@ async function processQuotesFile(quotesFile: string) {
 }
 
 function getModifiedDate(fileInfo: Deno.FileInfo) {
-  return fileInfo.mtime?.toISOString().split('T')[0] || "";
+    return fileInfo.mtime?.toISOString().split('T')[0] || "";
 }
 
 async function highlightCodeBlocks(content: string): Promise<string> {
