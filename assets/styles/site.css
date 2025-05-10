@@ -11,7 +11,7 @@
   --color-white: #F2E4CD;
   --color-dark-gray: #3F3943;
 
-  --body-bg: var(--color-black);
+  --body-bg: var(--color-white);
   --header-bg: var(--color-dark-gray);
   --box-bg: var(--color-white);
 
