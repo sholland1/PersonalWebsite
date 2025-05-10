@@ -14,6 +14,7 @@ const TEMPLATE_FILE = "template.html";
 
 console.log("Creating basic site...");
 const blogParams = await Array.fromAsync(processBlogFiles("pages/blog/*.html"));
+blogParams.sort(flip(compareByDatePublished));
 const topLevelParams = await Array.fromAsync(processBlogFiles("pages/*.html"));
 const rankingsParams = await Array.fromAsync(processRankingsFiles());
 const quotesParams = await processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
@@ -194,4 +195,14 @@ async function replaceAsync(str: string, regex: RegExp, asyncFn: (...args: strin
     });
     const data = await Promise.all(promises);
     return str.replace(regex, () => data.shift() || '');
+}
+
+function compareByDatePublished(a: { date_published: string | null }, b: { date_published: string | null }) {
+    if (!a.date_published) return 1;
+    if (!b.date_published) return -1;
+    return a.date_published.localeCompare(b.date_published);
+}
+
+function flip<T, U>(f: (a: T, b: T) => U): (a: T, b: T) => U {
+    return (a, b) => f(b, a);
 }
