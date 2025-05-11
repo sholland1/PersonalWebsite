@@ -1,0 +1,135 @@
+<!--
+title: Asking LLMs for Help with Commands in the Terminal
+date_published: 2025-05-09
+tags: terminal, shell, scripts, llm, linux
+-->
+<article>
+    <p>
+        In this article, I want to talk about a <code>zsh</code> plugin that I've written to quickly ask an <abbr title="Large Language Model">LLM</abbr> for help with terminal commands.
+        I also have a PowerShell version to do the same thing, but I won't talk about it here.
+    </p>
+
+    <p>
+        This plugin allows you to press a hotkey which will open a text editor.
+        You can then type, in natural language, a description of what you want your command to do.
+        Then, when you save the file and close the editor, it sends your description to an LLM, returns the desired command, and places the text of the command on the command line.
+        You are then free to edit the command and execute it by pressing Enter.
+        Importantly, this will place the command in your command history.
+        You can also press the hotkey again to ask the LLM to edit the command if it's not quite right.
+    </p>
+
+    <h3>Requirements</h3>
+    <p>
+        You will need the following:
+        <ul>
+            <li><code>zsh</code> (<code>bash</code> doesn't have the required features unfortunately)</li>
+            <li><code>jq</code>, <code>sed</code>, and <code>awk</code> (for wrangling json)</li>
+            <li>a text editor (I use Neovim)</li>
+            <li>an API key for an LLM (I am using <a href="https://console.anthropic.com/">Claude</a>)</li>
+            <li>the plugin (I will go into detail about this below.)</li>
+        </ul>
+    </p>
+
+    <h3>Setup</h3>
+    <p>First, you will need the plugin:</p>
+    <p>I keep it in <code>~/bin/cmd-assistant.plugin.zsh</code>.</p>
+
+    <pre>
+<code class="language-zsh">
+    #!/bin/zsh
+
+    function do_completion_claude() {
+        local messages="$1"
+        echo "$messages" > "/tmp/messages.json"
+
+        local body=$(echo '{
+            "model": "claude-3-5-sonnet-20241022",
+            "max_tokens": 200,
+            "system": '"$(echo "$messages" | jq ".[0].content")"',
+            "messages": '"$(echo "$messages" | jq ".[1:]")"'
+        }')
+        echo "$body" > "/tmp/completion_request.json"
+
+        local result=$(curl -s -X POST https://api.anthropic.com/v1/messages \
+            -H "x-api-key: ${ANTHROPIC_API_KEY:?}" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "Content-Type: application/json" \
+            -d "$body")
+        echo "$result" > "/tmp/completion_response.json"
+
+        echo "$result" |
+            awk 'NR==1 {line=$0; next} {line=line "\\n" $0} END {print line}' |
+            jq -r '.content[0].text'
+    }
+
+    function create_completion() {
+        local system_messages_file=~/bin/CmdLinePrompt.jsonl
+        local prompt_file=/tmp/PROMPT_MSG
+        local text_from_cmd=${BUFFER}
+
+        echo -n "$text_from_cmd" > "$prompt_file"
+        $EDITOR "$prompt_file" || { echo "Editor failed" >&2; return 1; }
+
+        local content=$(<"$prompt_file" | sed ':a;N;$!ba;s/\n/\\\\n/g')
+
+        local messages=$(
+            jq -s . $system_messages_file |
+            jq --arg content "$content" '. + [{"role": "user", "content": $content}]')
+
+        local completion=$(do_completion_claude "$messages")
+
+        BUFFER=$completion
+        CURSOR=${#BUFFER}
+    }
+
+    zle -N do_completion_claude
+    zle -N create_completion
+    bindkey '^X' create_completion
+
+</code>
+    </pre>
+
+    <p>Second, you will need a prompts file:</p>
+    <p>
+        I keep this in <code>~/bin/CmdLinePrompt.jsonl</code>.
+        This contains a system prompt and examples to help the LLM know what to do.
+        I'm not sure how important the examples are now that LLMs have gotten so good.
+    </p>
+
+    <pre>
+<code class="language-text">
+    {"role": "system", "content": "Given a description of a linux command, return the command to run. \
+    Return only the command and nothing else. Do not explain the command. Use the current directory \
+    unless otherwise specified. Assume Arch Linux and zsh shell."}
+    {"role": "user", "content": "List files"}
+    {"role": "assistant", "content": "ls -l"}
+    {"role": "user", "content": "Count files in a directory"}
+    {"role": "assistant", "content": "ls -l | wc -l"}
+    {"role": "user", "content": "Disk space used by home directory"}
+    {"role": "assistant", "content": "du ~"}
+    {"role": "user", "content": "Replace foo with bar in all .py files"}
+    {"role": "assistant", "content": "sed -i .bak -- 's/foo/bar/g' *.py"}
+    {"role": "user", "content": "Install the package foo"}
+    {"role": "assistant", "content": "sudo pacman -S foo"}
+    {"role": "user", "content": "Delete the models subdirectory"}
+    {"role": "assistant", "content": "rm -rf ./models"}
+
+</code>
+    </pre>
+
+    <p>
+        Third, you will need to set your API key to an environment variable and install the plugin.
+        I keep my API key in a .env file.
+        The environment variable for Claude should be called <code>$ANTHROPIC_API_KEY</code>.
+        Here's how I do the setup in my <code>.zshrc</code> file.
+    </p>
+
+    <pre>
+<code class="language-sh">
+    # set [-+]a enables and disables automatic export of variables
+    set -a; source ~/.env; set +a
+    source ~/bin/cmd-assistant.plugin.zsh
+
+</code>
+    </pre>
+</article>
