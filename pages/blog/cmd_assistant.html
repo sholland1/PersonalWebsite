@@ -32,13 +32,13 @@ tags: terminal, shell, scripts, llm, linux
 
     <h3>Setup</h3>
     <p>First, you will need the plugin:</p>
-    <p>I keep it in <code>~/bin/cmd-assistant.plugin.zsh</code>.</p>
+    <p>I keep it in <code>$HOME/bin/cmd-assistant.plugin.zsh</code>.</p>
 
     <code class="language-sh">#!/bin/zsh
 
 function do_completion_claude() {
     local messages="$1"
-    echo "$messages" > "/tmp/messages.json"
+    echo "$messages" > "/tmp/completion_messages.json"
 
     local body=$(echo '{
         "model": "claude-3-5-sonnet-20241022",
@@ -61,12 +61,17 @@ function do_completion_claude() {
 }
 
 function create_completion() {
-    local system_messages_file=~/bin/CmdLinePrompt.jsonl
+    local system_messages_file="$HOME/bin/CmdLinePrompt.jsonl"
     local prompt_file=/tmp/PROMPT_MSG
     local text_from_cmd=${BUFFER}
 
     echo -n "$text_from_cmd" > "$prompt_file"
-    $EDITOR "$prompt_file" || { echo "Editor failed" >&2; return 1; }
+    $EDITOR "$prompt_file" 2>/dev/null || {
+        notify-send -t 8000 -u critical \
+            "Error in [cmd-assistant] script" \
+            "Failed to open editor: $EDITOR" 2>/dev/null || true
+        return 1
+    }
 
     local content=$(<"$prompt_file" | sed ':a;N;$!ba;s/\n/\\\\n/g')
 
@@ -87,7 +92,7 @@ bindkey '^X' create_completion
 
     <p>Second, you will need a prompts file:</p>
     <p>
-        I keep this in <code>~/bin/CmdLinePrompt.jsonl</code>.
+        I keep this in <code>$HOME/bin/CmdLinePrompt.jsonl</code>.
         This contains a system prompt and examples to help the LLM know what to do.
         I'm not sure how important the examples are now that LLMs have gotten so good.
     </p>
@@ -119,7 +124,7 @@ unless otherwise specified. Assume Arch Linux and zsh shell."}
 
     <code class="language-sh">
 # set [-+]a enables and disables automatic export of variables
-set -a; source ~/.env; set +a
-source ~/bin/cmd-assistant.plugin.zsh
+set -a; source "$HOME/.env"; set +a
+source "$HOME/bin/cmd-assistant.plugin.zsh"
     </code>
 </article>
