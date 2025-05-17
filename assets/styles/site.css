@@ -1,7 +1,7 @@
 :root {
   /*--header-image: url('../images/wp.jpeg');*/
   --body-bg-image: url('../images/poolside-fm-lost-in-tripoli-sail.gif');
-  --cursor-image: url('../images/cursor.gif');
+  --cursor-image: url('../images/kitty-hand-cursor.png');
   /*--bar-image: url('../images/bar.png');*/
   --bullet-image: url('../images/bullet.gif');
 
@@ -49,9 +49,9 @@ body {
   color: var(--text-color);
   background-image: var(--body-bg-image);
   background-attachment: fixed;
-  cursor: var(--cursor-image), auto;
 
   a {
+    cursor: var(--cursor-image), auto;
     color: var(--link-color);
   }
 }
