@@ -76,14 +76,11 @@ ul {
 .header {
   background: #333;
   color: white;
-  padding: 1em;
   text-align: center;
   margin-bottom: 1em;
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
 
   background-color: var(--header-bg);
   background-image: var(--header-image);
-  border: 1px solid var(--border-color);
 }
 
 .container {
@@ -100,32 +97,27 @@ ul {
   }
 }
 
-aside {
+.header, aside, main, footer {
+  border: 1px solid var(--border-color);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
   padding: 1em;
+}
+
+aside {
+  order: 1;
+  min-width: 240px;
   width: 240px;
 
   background-color: var(--sidebar-bg);
-  background-image: var(--bar-image);
-  background-repeat: repeat-x;
   font-size: smaller;
-  border: 1px solid var(--border-color);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
 }
 
 main {
-  padding: 1em;
   flex: 1;
 
   background-color: var(--content);
-  background-image: var(--bar-image);
-  background-repeat: repeat-x;
   order: 2;
-  border: 1px solid var(--border-color);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
-}
-
-.sidebar {
-  order: 1;
+  width: 0;
 }
 
 footer {
@@ -133,12 +125,9 @@ footer {
 
   background: #333;
   color: white;
-  padding: 1em;
   text-align: center;
 
   background-color: var(--footer-bg);
-  border: 1px solid var(--border-color);
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
 }
 
 h1 {
@@ -146,11 +135,7 @@ h1 {
   font-family: sans-serif;
 }
 
-h2,
-h3,
-h4,
-h5,
-h6 {
+h2, h3, h4, h5, h6 {
   color: var(--big-text-color);
   font-family: sans-serif;
 }
@@ -160,13 +145,17 @@ h1 {
 }
 
 strong {
-  /* this styles bold text */
   color: var(--big-text-color);
+}
+
+pre {
+  overflow-x: auto;
+  margin: 0;
 }
 
 code {
   font-family: monospace;
-  font-size: 1.3em;
+  font-size: 1.25em;
   line-height: 1.0;
 
   counter-reset: step;
@@ -180,7 +169,12 @@ code .line::before {
   margin-right: 1.0rem;
   display: inline-block;
   text-align: right;
-  color: rgba(115,138,148,.4)
+  color: rgba(115,138,148,.4);
+}
+
+video {
+  max-width: 100%;
+  height: auto;
 }
 
 /* this is just a cool box, it's the darker colored one */
@@ -194,31 +188,44 @@ code .line::before {
 
 /* BELOW THIS POINT IS MEDIA QUERY */
 
-/* so you wanna change the width of your page?
-by default, the container width is 900px.
-in order to keep things responsive, take your new height,
-and then subtrack it by 100. use this new number as the
-"max-width" value below
-*/
-
 @media only screen and (max-width: 800px) {
   #flex {
     flex-wrap: wrap;
   }
 
+  main {
+    order: 1;
+    margin-bottom: 1em;
+    width: auto;
+  }
+
   aside {
+    order: 2;
     width: 100%;
   }
 
-  /* the order of the items is adjusted here for responsiveness!
-since the sidebars would be too small on a mobile device.
-feel free to play around with the order!
-*/
-  main {
-    order: 1;
+  .header {
+    padding: 0;
+    margin-bottom: 1em;
+  }
+
+  .wrapper {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .container {
+    flex-direction: column;
+    margin: 0 0 1em 0;
+    gap: 0;
   }
 
   .sidebar {
-    order: 2;
+    width: auto;
+  }
+
+  .header, .sidebar, .content, .footer {
+    box-shadow: none;
   }
 }
