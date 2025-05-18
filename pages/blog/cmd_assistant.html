@@ -16,7 +16,7 @@ tags: terminal, shell, scripts, llm, linux
         You can then type, in natural language, a description of what you want your command to do.
         Then, when you save the file and close the editor, it sends your description to an LLM, returns the desired command,
         and places the text of the command on the command line.
-        You are then free to edit the command and execute it by pressing Enter.
+        You are then free to edit the command and execute it by pressing <code>Enter</code>.
         Importantly, this will place the command in your command history.
         You can also press the hotkey again to ask the LLM to edit the command if it's not quite right.
     </p>
@@ -69,7 +69,10 @@ function process_command_completion() {
     local current_command=${BUFFER}
 
     echo -n "$current_command" > "$user_prompt_file"
-    $EDITOR "$user_prompt_file" 2>/dev/null || { echo "Failed to open editor: '$EDITOR'" >&2; return 1; }
+    $EDITOR "$user_prompt_file" 2>/dev/null || {
+        echo "Failed to open editor: '$EDITOR'" >&2;
+        return 1;
+    }
     local user_content=$(<"$user_prompt_file" | sed ':a;N;$!ba;s/\n/\\\\n/g')
 
     local formatted_messages=$(
