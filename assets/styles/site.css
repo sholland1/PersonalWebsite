@@ -162,6 +162,12 @@ code {
   counter-increment: step 0;
 }
 
+code:not(pre code) {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
 code .line::before {
   content: counter(step);
   counter-increment: step;
