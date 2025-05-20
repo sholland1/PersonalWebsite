@@ -207,7 +207,7 @@ video {
 
   aside {
     order: 2;
-    width: 100%;
+    width: auto;
   }
 
   .header {
@@ -227,11 +227,7 @@ video {
     gap: 0;
   }
 
-  .sidebar {
-    width: auto;
-  }
-
-  .header, .sidebar, .content, .footer {
+  .header, aside, main, .footer {
     box-shadow: none;
   }
 }
