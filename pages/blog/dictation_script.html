@@ -26,16 +26,16 @@ tags: scripts, linux
   <h3>Requirements</h3>
   <p>
     You will need the following:
-  <ul>
-    <li><code>bash</code></li>
-    <!-- TODO: affiliate link for mic -->
-    <li>a microphone (I use a Zealsound K66)</li>
-    <li><code>parec</code> and <code>amixer</code> (for controlling the microphone)</li>
-    <li><code>whisper.cpp</code> and a speech to text model (for transcribing text)</li>
-    <li><code>xsel</code> (for saving to the clipboard)</li>
-    <li><code>xdotool</code> (for pasting the text from the clipboard)</li>
-    <li><code>sxhkd</code> (for assigning the hotkeys)</li>
-  </ul>
+    <ul>
+      <li><code>bash</code></li>
+      <!-- TODO: affiliate link for mic -->
+      <li>a microphone (I use a Zealsound K66)</li>
+      <li><code>parec</code> and <code>amixer</code> (for controlling the microphone)</li>
+      <li><code>whisper.cpp</code> and a speech to text model (for transcribing text)</li>
+      <li><code>xsel</code> (for saving to the clipboard)</li>
+      <li><code>xdotool</code> (for pasting the text from the clipboard)</li>
+      <li><code>sxhkd</code> (for assigning the hotkeys)</li>
+    </ul>
   </p>
 
   <h3>Setup</h3>
@@ -106,7 +106,7 @@ if [ -n "$TRANSCRIPTION" ] && [ "$TRANSCRIPTION" != "[BLANK_AUDIO]" ]; then
 else
   echo "No text to output. The transcription may have failed or produced no results."
 fi
-    </code>
+  </code>
 
   <p>
     This script will be called with a <code>start</code> or <code>stop</code> parameter.
@@ -126,7 +126,7 @@ fi
   <code class="language-sh">
 {_, @}Control_R
         speech-to-text {start, stop}
-    </code>
+  </code>
 
   <p>
     I wanted a one key press and release for the hotkey, and luckily, <code>sxhkd</code> allows this with modifier keys.
@@ -146,7 +146,7 @@ fi
 
   <code class="language-sh">#!/bin/bash
 timeout 0.1s parec -d alsa_input.usb-K66_K66_20190805V001-00.analog-stereo &
-    </code>
+  </code>
 
   <p>
     Another issue with this setup is that, currently, it could interfere with other uses of the microphone.
