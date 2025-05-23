@@ -1,0 +1,180 @@
+<!--
+title: Speech to Text Setup for Linux
+date_published: 2025-05-10
+tags: scripts, linux
+-->
+<article>
+  <p>
+    In this article, I want to explain the speech-to-text setup I have on my Linux system.
+    With <abbr title="Large Language Model">LLMs</abbr> becoming more integrated into my usage of computers,
+    it is beneficial to be able to input natural language into the computer more quickly and with less effort.
+    I also find myself using this setup to enter queries into search engines.
+    If you read my <a href="blog/cmd_assistant.html">previous article</a>, you will find that this setup will improve
+    your experience with the plugin described therein even further.
+  </p>
+
+  <p>
+    This script allows you to start recording with your computer's microphone by holding down the
+    <code>Right Ctrl</code> key.
+    Once you've spoken your message, you can release the key to stop recording.
+    The script then transcribes the text and outputs it as if you were pasting it from the clipboard.
+    Be sure to have your cursor in the location you want the text to be inserted.
+    It also places the text into the clipboard in case you need it again later.
+    I've found this to be a surprisingly useful feature.
+  </p>
+
+  <h3>Requirements</h3>
+  <p>
+    You will need the following:
+  <ul>
+    <li><code>bash</code></li>
+    <!-- TODO: affiliate link for mic -->
+    <li>a microphone (I use a Zealsound K66)</li>
+    <li><code>parec</code> and <code>amixer</code> (for controlling the microphone)</li>
+    <li><code>whisper.cpp</code> and a speech to text model (for transcribing text)</li>
+    <li><code>xsel</code> (for saving to the clipboard)</li>
+    <li><code>xdotool</code> (for pasting the text from the clipboard)</li>
+    <li><code>sxhkd</code> (for assigning the hotkeys)</li>
+  </ul>
+  </p>
+
+  <h3>Setup</h3>
+  <p>
+    First, you will need a microphone.
+    I am using a Zealsound K66.
+    I got it for under $40 on Amazon.
+    I don't know if it's good for anything else, but the sound quality is great to my ears, and it gets the job done.
+    It uses USB and sits on my desk directly in front of me.
+    I didn't want to use a headset microphone because I wanted to be able to use it
+    without grabbing the headset if I didn't happen to already have it on.
+  </p>
+
+  <p>
+    The key piece of this setup is
+    <code><a href="https://github.com/ggml-org/whisper.cpp" target="_blank">whisper.cpp</a></code>.
+    It does the actual work of transcribing the sound file containing your speech into text.
+    You will need to compile this project from source and download a model to use whisper.
+    You can find instructions to do this in the project's
+    <a href="https://github.com/ggml-org/whisper.cpp/blob/master/README.md" target="_blank">README</a> under the
+    <a href="https://github.com/ggml-org/whisper.cpp/blob/master/README.md#quick-start" target="_blank">Quick Start</a>
+    section.
+    There are several models to choose from, but I have found that the 'tiny' model is fast and transcribes the text
+    well enough.
+    I was surprised at how quick the transcription process happens with my old computer.
+  </p>
+
+  <p>
+    Once you have the project built, ensure the 'main' executable generated from building whisper.cpp is in your path.
+    I setup a symbolic link with this command <code>ln -s ~/Projects/whisper.cpp/main ~/bin/whisper</code>.
+    I put my model file in <code>~/.cache/whisper/ggml-tiny.en.bin</code>.
+    These will be used in the following script, which I have named <code>speech-to-text</code>.
+  </p>
+
+  <code class="language-sh">#!/bin/bash
+
+SPEECH_FILE="/tmp/mic_input.wav"
+MODEL_FILE="$HOME/.cache/whisper/ggml-tiny.en.bin"
+
+if [ "$1" = "stop" ]; then
+  echo "Stopping recording..."
+  set-status --not-recording
+  pkill -SIGTERM parec
+  exit 0
+fi
+
+echo "Starting speech-to-text process..."
+
+echo "Display recording status..."
+set-status --recording
+
+echo "Starting audio recording..."
+amixer set Mic -D hw:K66 cap > /dev/null # Unmute
+timeout 180s parec --rate=16000 --latency-msec=20 --file-format=wav \
+  -d alsa_input.usb-K66_K66_20190805V001-00.analog-stereo > "$SPEECH_FILE"
+amixer set Mic -D hw:K66 nocap > /dev/null # Mute
+
+echo "Transcribing audio..."
+TRANSCRIPTION=$(
+  whisper -nt -np -m "$MODEL_FILE" -f "$SPEECH_FILE" | \
+    sed '/^$/d;s/^[[:space:]]*//')
+
+if [ -n "$TRANSCRIPTION" ] && [ "$TRANSCRIPTION" != "[BLANK_AUDIO]" ]; then
+  echo "Transcription: '$TRANSCRIPTION'"
+  echo -n "$TRANSCRIPTION" | xsel -b && xdotool key shift+Insert
+  notify-send "Copied text to clipboard." "$TRANSCRIPTION"
+  echo "Done."
+else
+  echo "No text to output. The transcription may have failed or produced no results."
+fi
+    </code>
+
+  <p>
+    This script will be called with a <code>start</code> or <code>stop</code> parameter.
+    The start parameter unmutes the mic and starts recording the audio.
+    The output file is set to <code>/tmp/mic_input.wav</code>.
+    When you call the script again with the stop parameter, it kills the program that does the recording.
+    The original run of the script continues, muting the mic and doing the transcription using <code>whisper</code>.
+    The transcribed text is copied to the clipboard and immediately pasted wherever your cursor is located.
+  </p>
+
+  <p>
+    To execute the script, I use the hotkey daemon, <code>sxhkd</code>, with the following configuration.
+    This executes the script with the start parameter when I press the <code>Right Ctrl</code> key down
+    and with the stop parameter when I release it.
+  </p>
+
+  <code class="language-sh">
+{_, @}Control_R
+        speech-to-text {start, stop}
+    </code>
+
+  <p>
+    I wanted a one key press and release for the hotkey, and luckily, <code>sxhkd</code> allows this with modifier keys.
+    The only time I use <code>Right Ctrl</code> is to backspace a word.
+    Another option for the hotkey would be <code>Right Alt</code>, which I don't think I use at all.
+    Regardless, this is configurable in the hotkey daemon.
+  </p>
+
+  <h3>Issues</h3>
+
+  <p>
+    A slight problem I ran into was that the microphone would fail to record on the first time I logged into my
+    computer.
+    I was able to fix this by running the following command in my <code>.xinitrc</code>.
+    This just records with my mic for a tenth of a second on startup, so the next recording will work properly.
+  </p>
+
+  <code class="language-sh">#!/bin/bash
+timeout 0.1s parec -d alsa_input.usb-K66_K66_20190805V001-00.analog-stereo &
+    </code>
+
+  <p>
+    Another issue with this setup is that, currently, it could interfere with other uses of the microphone.
+    Since the script mutes and unmutes the mic unconditionally, if you are using the mic for another purpose,
+    like voice chat for example, the script will mute the mic, interrupting your chat.
+    This would need to be fixed in the script somehow.
+  </p>
+
+  <h3>Conclusion</h3>
+  <p>
+    Even it requires a good bit of setup, it is worth
+    This script is one of my most used on my system.
+    It is now my preferred way to input natural language into the computer.
+    When I first started using this setup, it felt like I was in Star Trek, but it feels pretty comfortable now.
+  </p>
+
+  <iframe width="420" height="315" src="https://www.youtube.com/embed/1ZXugicgn6U"></iframe>
+
+  <p>
+    If you want to find out this setup can be used to ask an LLM for help on the command line,
+    check out my <a href="blog/cmd_assistant.html">previous article</a>.
+  </p>
+
+  <p>
+    The plugin script referenced in this post is a simplified version.
+    You can view the <a href="https://github.com/sholland1/dotfiles/blob/master/bin/speech-to-text"
+      target="_blank">current version</a>
+    I use in my <a href="https://github.com/sholland1/dotfiles" target="_blank">dotfiles</a> repository on my GitHub.
+    Feel free to modify it for your use.
+  </p>
+</article>
