@@ -105,6 +105,7 @@ if [ -n "$TRANSCRIPTION" ] && [ "$TRANSCRIPTION" != "[BLANK_AUDIO]" ]; then
   echo "Done."
 else
   echo "No text to output. The transcription may have failed or produced no results."
+  notify-send "No text to output." "The transcription may have failed or produced no results."
 fi
   </code>
 
