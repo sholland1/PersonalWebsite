@@ -131,17 +131,12 @@ footer {
 }
 
 h1 {
-  color: var(--big-text-color);
-  font-family: sans-serif;
-}
-
-h2, h3, h4, h5, h6 {
-  color: var(--big-text-color);
-  font-family: sans-serif;
-}
-
-h1 {
   font-size: 55px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--big-text-color);
+  font-family: sans-serif;
 }
 
 strong {

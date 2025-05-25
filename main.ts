@@ -109,7 +109,7 @@ date_published: 2024-10-08 (optional)
 date_updated: 2024-10-09 (optional)
 tags: a, b, c
 -->
-<h2>Html content for rest of file</h2>
+<article>Html content for rest of file</article>
     */
     const metadata: { [key: string]: string } = {};
     let contentStartIndex = 0;
@@ -150,7 +150,6 @@ async function* processRankingsFiles() {
             tags: ['fun'],
             path: `game-rankings/${file.name.replace('Rankings.txt', '.html')}`,
         };
-
     }
 }
 
@@ -173,8 +172,8 @@ function getModifiedDate(fileInfo: Deno.FileInfo) {
 
 async function highlightCodeBlocks(content: string): Promise<string> {
     const codeBlockRegex = /<code class="language-(\w+)">([\s\S]*?)<\/code>/g;
-    return await replaceAsync(content, codeBlockRegex, async (_match, language, code) => {
-        return await codeToHtml(code, {
+    return await replaceAsync(content, codeBlockRegex, async (_match, language, code) =>
+        await codeToHtml(code, {
             lang: language,
             theme: 'github-light',
             transformers: [
@@ -182,8 +181,7 @@ async function highlightCodeBlocks(content: string): Promise<string> {
                 transformerNotationDiff(),
                 transformerNotationErrorLevel(),
             ],
-        });
-    });
+        }));
 }
 
 async function replaceAsync(str: string, regex: RegExp, asyncFn: (...args: string[]) => Promise<string>): Promise<string> {
