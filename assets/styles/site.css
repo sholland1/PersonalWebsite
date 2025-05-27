@@ -173,9 +173,16 @@ code .line::before {
   color: rgba(115,138,148,.4);
 }
 
-video {
+video, .video {
   max-width: 100%;
-  height: auto;
+  max-height: 315px;
+}
+
+.aspect-ratio-4x3 {
+  width:100%;
+  max-width: calc(315px * (4 / 3));
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
 }
 
 /* this is just a cool box, it's the darker colored one */
