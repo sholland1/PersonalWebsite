@@ -11,13 +11,16 @@
             "program": "${workspaceFolder}/main.ts",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "env": {},
+            "env": {
+                "NO_COLOR": "1",
+            },
             "runtimeExecutable": "/usr/bin/deno",
             "runtimeArgs": [
                 "run",
-                "--unstable",
+                "--allow-read",
+                "--allow-write",
+                "--allow-env=VSCODE_TEXTMATE_DEBUG",
                 "--inspect-wait",
-                "--allow-all"
             ],
             "attachSimplePort": 9229
         }

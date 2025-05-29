@@ -17,7 +17,7 @@ end
 
 function RegenerateProject()
   vim.api.nvim_command('silent! write')
-  local cmd_output = vim.fn.system("NO_COLOR=1 deno --allow-read --allow-write --allow-env=VSCODE_TEXTMATE_DEBUG main.ts 2>&1")
+  local cmd_output = vim.fn.system("run")
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_err_writeln(cmd_output)
     return
