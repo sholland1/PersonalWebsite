@@ -205,6 +205,10 @@ video, .video {
     flex-wrap: wrap;
   }
 
+  h1 {
+    font-size: 44px;
+  }
+
   main {
     order: 1;
     margin-bottom: 1em;
