@@ -57,6 +57,11 @@ body {
 }
 
 ul {
+  margin-left: -1.5em;
+
+  li::marker {
+    font-size: 1.1rem;
+  }
 }
 
 /* below this line is CSS for the layout */
