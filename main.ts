@@ -45,6 +45,7 @@ const allParams = [...siteParams.Blog, ...siteParams.GameRankings, ...siteParams
     ...params,
     nav_content: navHtml,
     current_year: new Date().getFullYear(),
+    base_url: 'http://localhost:8000/output',
 }));
 
 // console.log(allParams)

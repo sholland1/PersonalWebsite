@@ -1,4 +1,6 @@
 output
 scratch
+work
+.zed
 Notes.md
 *.vim

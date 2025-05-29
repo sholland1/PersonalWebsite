@@ -4,34 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}} — My Dumb Site</title>
-  <!-- <base href="file:///home/sholland/Projects/PersonalWebsite/output/"> -->
-  <base href="http://localhost:8000/output">
+  <base href="{{base_url}}">
   <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
 
   <link rel="preload" href="assets/images/poolside-fm-lost-in-tripoli-sail.gif" as="image">
-  <link rel="preload" href="assets/images/bullet.gif" as="image">
 
   <link rel="preload" href="assets/styles/site.css" as="style">
   <link rel="stylesheet" href="assets/styles/site.css">
-
-  <style>
-    pre.has-highlighted span.highlighted {
-      text-decoration: underline wavy;
-      text-underline-offset: 3px;
-    }
-
-    pre.has-highlighted span.highlighted.error { text-decoration-color: #B5575B; }
-    pre.has-highlighted span.highlighted.warning { text-decoration-color: #F2E4CD; }
-
-    pre.has-focused .line:not(.focused) {
-      filter: blur(2px);
-      transition: filter 0.3s ease;
-    }
-    pre.has-focused:hover .line:not(.focused) { filter: blur(0); }
-
-    pre.has-diff span.diff { background-color: green; }
-    pre.has-diff span.diff.remove { background-color: red; }
-  </style>
 </head>
 
 <body>
