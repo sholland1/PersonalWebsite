@@ -14,15 +14,17 @@ const TEMPLATE_FILE = "template.html";
 
 console.log("Creating basic site...");
 const blogParams = await Array.fromAsync(processBlogFiles("pages/blog/*.html"));
-blogParams.sort(flip(compareByDatePublished));
+blogParams.sort(flip(compareByDate));
+const blogIndexParams = createIndexParams("Blog Index", "blog/index.html", blogParams);
 const topLevelParams = await Array.fromAsync(processBlogFiles("pages/*.html"));
 const rankingsParams = await Array.fromAsync(processRankingsFiles());
-const quotesParams = await processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
+const rankingsIndexParams = createIndexParams("Game Rankings Index", "game-rankings/index.html", rankingsParams);
+// const quotesParams = await processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
 
 const siteParams: SiteParams = {
     Blog: blogParams,
     GameRankings: rankingsParams,
-    TopLevel: [quotesParams, ...topLevelParams],
+    TopLevel: topLevelParams //[quotesParams, ...topLevelParams],
 };
 
 for (const [key, arr] of Object.entries(siteParams)) {
@@ -41,7 +43,7 @@ await emptyDir(OUTPUT_DIR);
 
 console.log("Adding nav to template...");
 
-const allParams = [...siteParams.Blog, ...siteParams.GameRankings, ...siteParams.TopLevel].map(params => ({
+const allParams = [...Object.values(siteParams).flat(), blogIndexParams, rankingsIndexParams].map(params => ({
     ...params,
     nav_content: navHtml,
     current_year: new Date().getFullYear(),
@@ -100,6 +102,17 @@ async function* processBlogFiles(glob: string) {
         const relativePath = file.path.replace(/^.*?pages/, '').replace(/^\//, '');
         yield await parseArticle(articleText, relativePath);
     }
+}
+
+function createIndexParams(title: string, path: string, params: Array<{ title: string; date_published: string | null; date_updated: string | null; path: string }>) {
+    params.sort(flip(compareByDate));
+    return {
+        title, path,
+        content: params.map(page => {
+            const formattedTitle = page.title.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+            return `<h4><a href="${page.path}">${formattedTitle}</a> - ${page.date_published || page.date_updated || 'No date'}</h4>`;
+        }).join('\n'),
+    };
 }
 
 async function parseArticle(articleText: string, path: string) {
@@ -196,10 +209,16 @@ async function replaceAsync(str: string, regex: RegExp, asyncFn: (...args: strin
     return str.replace(regex, () => data.shift() || '');
 }
 
-function compareByDatePublished(a: { date_published: string | null }, b: { date_published: string | null }) {
-    if (!a.date_published) return 1;
-    if (!b.date_published) return -1;
-    return a.date_published.localeCompare(b.date_published);
+function compareByDate(a: { date_published: string | null, date_updated: string | null }, b: { date_published: string | null, date_updated: string | null }) {
+    if (a.date_published && b.date_published) {
+        return a.date_published.localeCompare(b.date_published);
+    }
+    if (a.date_updated && b.date_updated) {
+        return a.date_updated.localeCompare(b.date_updated);
+    }
+    if (!a.date_published && !a.date_updated) return 1;
+    if (!b.date_published && !b.date_updated) return -1;
+    return 0;
 }
 
 function flip<T, U>(f: (a: T, b: T) => U): (a: T, b: T) => U {
