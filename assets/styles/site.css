@@ -6,6 +6,7 @@
   --bullet-image: url('../images/bullet.gif');
 
   --color-dark-red: #B5575B;
+  --color-darker-red: #984A4D;
   --color-mustard-yellow: #AAB1B2;
   --color-black: #442122;
   --color-white: #F2E4CD;
@@ -18,7 +19,7 @@
   --content: var(--color-dark-gray);
   --text-color: var(--color-white);
   --link-color: var(--color-dark-red);
-  --visited-link-color: var(--color-mustard-yellow);
+  --visited-link-color: var(--color-darker-red);
   --sidebar-bg: var(--color-dark-gray);
   --footer-bg: var(--color-dark-gray);
   --border-color: var(--color-mustard-yellow);
