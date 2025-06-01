@@ -4,3 +4,6 @@ work
 .zed
 Notes.md
 *.vim
+
+# Local Netlify folder
+.netlify

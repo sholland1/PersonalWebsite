@@ -42,12 +42,11 @@ console.log("Emptying output directory...");
 await emptyDir(OUTPUT_DIR);
 
 console.log("Adding nav to template...");
-
 const allParams = [...Object.values(siteParams).flat(), blogIndexParams, rankingsIndexParams].map(params => ({
     ...params,
     nav_content: navHtml,
     current_year: new Date().getFullYear(),
-    base_url: 'http://localhost:8000/output',
+    base_url: Deno.args[0],
 }));
 
 // console.log(allParams)
