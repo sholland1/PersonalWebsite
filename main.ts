@@ -75,8 +75,7 @@ function generateNavHtml(siteParams: SiteParams): string[] {
     const parts = ['<ul>'];
     parts.push('<li><a href="blog/index.html">Blog</a><ul>')
     for (const blog of siteParams.Blog) {
-        const formattedTitle = blog.title.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
-        parts.push(`<li><a href="${blog.path}">${formattedTitle}</a></li>`);
+        parts.push(`<li><a href="${blog.path}">${blog.title}</a></li>`);
     }
     parts.push('</ul>');
 
@@ -88,8 +87,7 @@ function generateNavHtml(siteParams: SiteParams): string[] {
     parts.push('</ul>');
 
     for (const other of siteParams.TopLevel) {
-        const formattedTitle = other.title.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
-        parts.push(`<li><a href="${other.path}">${formattedTitle}</a></li>`);
+        parts.push(`<li><a href="${other.path}">${other.title}</a></li>`);
     }
     parts.push('</ul>');
     return parts;
@@ -108,10 +106,7 @@ function createIndexParams(title: string, path: string, params: Array<{ title: s
     params.sort(flip(compareByDate));
     return {
         title, path,
-        content: params.map(page => {
-            const formattedTitle = page.title.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
-            return `<h4><a href="${page.path}">${formattedTitle}</a> - ${page.date_published || page.date_updated || 'No date'}</h4>`;
-        }).join('\n'),
+        content: params.map(page => `<h4><a href="${page.path}">${page.title}</a> - ${page.date_published || page.date_updated || 'No date'}</h4>`).join('\n'),
     };
 }
 
