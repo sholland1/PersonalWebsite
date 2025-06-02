@@ -27,7 +27,7 @@
                 "--allow-write",
                 "--allow-env=VSCODE_TEXTMATE_DEBUG",
                 "${workspaceFolder}/main.ts",
-                "https://dumb-site.netlify.app/"
+                "https://mydumbsite.net"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
