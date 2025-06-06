@@ -27,13 +27,6 @@ const siteParams: SiteParams = {
     TopLevel: topLevelParams //[quotesParams, ...topLevelParams],
 };
 
-for (const [key, arr] of Object.entries(siteParams)) {
-    console.log(`Processing ${key}`);
-    for (const params of arr) {
-        console.log(`  Processing ${params.path}`);
-    }
-}
-
 console.log("Creating nav...");
 const navHtml = generateNavHtml(siteParams).join('\n');
 // console.log(navHtml);
@@ -71,22 +64,28 @@ interface SiteParams {
 }
 
 function generateNavHtml(siteParams: SiteParams): string[] {
+    console.log(`Processing Blog`);
     const parts = ['<ul>'];
     parts.push('<li><a href="blog/index.html">Blog</a><ul>')
     for (const blog of siteParams.Blog) {
+        console.log(`  Processing ${blog.path}`);
         parts.push(`<li><a href="${blog.path}">${blog.title}</a></li>`);
     }
     parts.push('</ul>');
 
+    console.log(`Processing GameRankings`);
     parts.push('<li><a href="game-rankings/index.html">Game Rankings</a><ul>')
     for (const ranking of siteParams.GameRankings) {
+        console.log(`  Processing ${ranking.path}`);
         const linkText = ranking.path.split('/').pop()?.replace('.html', '');
         parts.push(`<li><a href="${ranking.path}">${linkText}</a></li>`);
     }
     parts.push('</ul>');
 
+    console.log(`Processing TopLevel`);
     for (const other of siteParams.TopLevel) {
-        parts.push(`<li><a href="${other.path}">${other.title}</a></li>`);
+        console.log(`  Processing ${other.path}`);
+        parts.push(`<li><a href="/${other.path}">${other.title}</a></li>`);
     }
     parts.push('</ul>');
     return parts;
