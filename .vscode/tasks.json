@@ -17,6 +17,7 @@
             },
             "problemMatcher": []
         },
+
         {
             "label": "run",
             "type": "shell",
@@ -33,6 +34,7 @@
                 "cwd": "${workspaceFolder}"
             }
         },
+
         {
             "label": "publish",
             "type": "shell",
@@ -46,6 +48,16 @@
                 "run"
             ],
             "problemMatcher": []
-        }
+        },
+
+        {
+            "label": "Open in Browser",
+            "type": "shell",
+            "command": "xdg-open",
+            "args": [
+                "http://localhost:8000"
+            ],
+            "problemMatcher": [],
+        },
     ]
 }
