@@ -182,12 +182,12 @@ async function highlightCodeBlocks(content: string): Promise<string> {
     return await replaceAsync(content, codeBlockRegex, async (_match, language, code) =>
         await codeToHtml(code, {
             lang: language,
-            theme: 'github-light',
             transformers: [
                 transformerNotationFocus(),
                 transformerNotationDiff(),
                 transformerNotationErrorLevel(),
             ],
+            theme: 'github-dark',
         }));
 }
 
