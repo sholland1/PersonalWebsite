@@ -20,8 +20,7 @@
                 "--allow-write",
                 "--allow-env=VSCODE_TEXTMATE_DEBUG",
                 "--inspect-wait",
-                "${workspaceFolder}/main.ts",
-                "http://localhost:8000/output",
+                "main.ts",
             ],
             "attachSimplePort": 9229
         }

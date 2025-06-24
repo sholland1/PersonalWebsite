@@ -1,0 +1,29 @@
+#!/bin/bash
+
+case "$1" in
+    run)
+        if [ -z "$2" ]; then
+            echo "Usage: $0 $1 <base_url>"
+            exit 1
+        fi
+        echo "Building the site..."
+        /usr/bin/deno run --allow-read --allow-write --allow-env=VSCODE_TEXTMATE_DEBUG main.ts "$2"
+        ;;
+    publish)
+        echo "Publishing the project..."
+        ~/.local/share/npm/bin/netlify deploy --prod --dir=output
+        ;;
+    serve)
+        echo "Serving the project locally..."
+        cd "${2:-.}/output" || exit
+        /usr/bin/deno run --allow-all https://deno.land/std@0.177.0/http/file_server.ts --port 8000
+        ;;
+    open)
+        echo "Opening in browser..."
+        xdg-open http://localhost:8000
+        ;;
+    *)
+        echo "Usage: $0 {run|publish|serve|open}"
+        exit 1
+        ;;
+esac

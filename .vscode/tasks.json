@@ -4,59 +4,51 @@
         {
             "label": "serve",
             "type": "shell",
-            "command": "/usr/bin/deno",
+            "command": "./project",
             "args": [
-                "run",
-                "--allow-all",
-                "https://deno.land/std@0.177.0/http/file_server.ts",
-                "--port",
-                "8000"
+                "serve",
+                "${workspaceFolder}"
             ],
-            "options": {
-                "cwd": "${workspaceFolder}/output"
-            },
-            "problemMatcher": []
+            "dependsOn": [ "run local" ],
+            "problemMatcher": [],
         },
 
         {
-            "label": "run",
+            "label": "run local",
             "type": "shell",
-            "command": "/usr/bin/deno",
+            "command": "./project",
             "args": [
                 "run",
-                "--allow-read",
-                "--allow-write",
-                "--allow-env=VSCODE_TEXTMATE_DEBUG",
-                "${workspaceFolder}/main.ts",
-                "https://mydumbsite.net"
+                "http://localhost:8000",
             ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
+            "problemMatcher": [],
+        },
+
+        {
+            "label": "run prod",
+            "type": "shell",
+            "command": "./project",
+            "args": [
+                "run",
+                "https://mydumbsite.net",
+            ],
+            "problemMatcher": [],
         },
 
         {
             "label": "publish",
             "type": "shell",
-            "command": "~/.local/share/npm/bin/netlify",
-            "args": [
-                "deploy",
-                "--prod",
-                "--dir=output"
-            ],
-            "dependsOn": [
-                "run"
-            ],
-            "problemMatcher": []
+            "command": "./project",
+            "args": [ "publish" ],
+            "dependsOn": [ "run prod" ],
+            "problemMatcher": [],
         },
 
         {
-            "label": "Open in Browser",
+            "label": "open",
             "type": "shell",
-            "command": "xdg-open",
-            "args": [
-                "http://localhost:8000"
-            ],
+            "command": "./project",
+            "args": [ "open" ],
             "problemMatcher": [],
         },
     ]
