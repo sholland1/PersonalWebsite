@@ -12,7 +12,9 @@ const OUTPUT_DIR = "output";
 const NOTES_DIR = "../../OneDrive/Documents/Notes"
 const TEMPLATE_FILE = "template.html";
 
-console.log("Creating basic site...");
+const base_url = Deno.args[0];
+
+console.log(`Creating basic site with base url: ${base_url}...`);
 const blogParams = await Array.fromAsync(processBlogFiles("pages/blog/*.html"));
 blogParams.sort(flip(compareByDate));
 const blogIndexParams = createIndexParams("Blog Index", "blog/index.html", blogParams);
@@ -39,7 +41,7 @@ const allParams = [...Object.values(siteParams).flat(), blogIndexParams, ranking
     ...params,
     nav_content: navHtml,
     current_year: new Date().getFullYear(),
-    base_url: Deno.args[0],
+    base_url,
 }));
 
 // console.log(allParams)

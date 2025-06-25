@@ -21,6 +21,7 @@
                 "--allow-env=VSCODE_TEXTMATE_DEBUG",
                 "--inspect-wait",
                 "main.ts",
+                "http://localhost:8000",
             ],
             "attachSimplePort": 9229
         }
