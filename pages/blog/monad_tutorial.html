@@ -6,7 +6,7 @@ tags: functional_programming
 TODO:
   [ ] talk a little more about pros and cons of FP
   [ ] add more links
-  [ ] improve table formatting
+  [x] improve table formatting
   [ ] add more info about effect systems
   [ ] make sure Haskell examples compile
   [ ] disclose all simplifications and add links to actual code
@@ -311,7 +311,7 @@ instance Monad Maybe where
       <tr><td>Reader</td><td>Configuration</td></tr>
       <tr><td>Writer</td><td>List of strings</td></tr>
       <tr><td>State</td><td>A mutable value</td></tr>
-      <tr><td>RWS</td><td>combination of<br>Reader, Writer, and State</td></tr>
+      <tr><td>RWS</td><td>combination of Reader, Writer, and State</td></tr>
       <tr><td>Except</td><td>Errors</td></tr>
       <tr><td>Parser</td><td>Position and state of parser</td></tr>
     </tbody>
@@ -443,18 +443,39 @@ int result = b + 1;
 
   <table>
     <thead>
-      <tr><th>Technique</th><th>Pros</th><th>Cons</th></tr>
+      <!-- <tr><th>Technique</th><th>Pros</th><th>Cons</th></tr> -->
       <tr><th>Technique</th><th>Description</th><th>Performance</th><th>Boilerplate</th><th>Ergonomics</th><th>Maturity</th></tr>
     </thead>
 
     <tbody>
-      <tr><td>IO</td><td>🥇</td><td>🥇</td><td>❌</td><td>🥇</td></tr>
-      <tr><td>transformers stack</td><td>🥉</td><td>🥇</td><td>🥈</td><td>🥇</td></tr>
-      <tr><td>Free Monads</td><td>🥈</td><td>🥉</td><td>🥈</td><td>🥇</td></tr>
-      <tr><td>effect systems</td><td>🥈</td><td>🥈</td><td>🥇</td><td>❌</td></tr>
-      <tr><td>ReaderT Env IO</td><td>🥇</td><td>🥈</td><td>🥈</td><td>🥈</td></tr>
-      <tr><td>Custom Monad</td><td>🥈</td><td>🥉</td><td>🥇</td><td>❌</td></tr>
-      <tr><td>Scala ZIO like</td><td>🥇</td><td>🥇</td><td>🥇</td><td>❌</td></tr>
+      <tr>
+        <td>IO</td><td>Everything</td>
+        <td style="text-align:center">🥇</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td><td style="text-align:center">🥇</td>
+      </tr>
+      <tr>
+        <td>transformers stack</td><td>build up a stack and write polymorphic functions</td>
+        <td style="text-align:center">🥉</td><td style="text-align:center">🥇</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td>
+      </tr>
+      <tr>
+        <td>Free Monads</td><td>...</td>
+        <td style="text-align:center">🥈</td><td style="text-align:center">🥉</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td>
+      </tr>
+      <tr>
+        <td>effect systems</td><td>...</td>
+        <td style="text-align:center">🥈</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td>
+      </tr>
+      <tr>
+        <td>ReaderT Env IO</td><td>...</td>
+        <td style="text-align:center">🥇</td><td style="text-align:center">🥈</td><td style="text-align:center">🥈</td><td style="text-align:center">🥈</td>
+      </tr>
+      <tr>
+        <td>Custom Monad</td><td>...</td>
+        <td style="text-align:center">🥈</td><td style="text-align:center">🥉</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td>
+      </tr>
+      <tr>
+        <td>Scala ZIO like</td><td>...</td>
+        <td style="text-align:center">🥇</td><td style="text-align:center">🥇</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td>
+      </tr>
     </tbody>
   </table>
 
