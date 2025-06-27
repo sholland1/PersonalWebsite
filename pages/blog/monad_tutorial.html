@@ -4,50 +4,53 @@ tags: functional_programming
 -->
 <!--
 TODO:
-  [ ] talk a little more about pros and cons of FP
-  [ ] add more links
+  [x] add more links
   [x] improve table formatting
-  [ ] add more info about effect systems
-  [ ] make sure Haskell examples compile
-  [ ] disclose all simplifications and add links to actual code
+  [x] disclose all simplifications and add links to actual code
+  [x] make sure code examples compile
+  [y] add more info about effect systems
+    - find blog post for Effect systems
+  [ ] talk a little more about pros and cons of FP
+  [ ] finish conclusion
 -->
 <article>
   <p>
     A couple of years after graduating college, I discovered functional programming.
-    I started with <abbr title="Language INtegrated Query">LINQ</abbr> in .NET, but I quickly found Haskell.
+    I started with <abbr title="Language INtegrated Query">LINQ</abbr> and immutability in .NET, but I quickly found <a href="https://en.wikipedia.org/wiki/Haskell" target="_blank">Haskell</a>.
     I explored the <abbr title="Functional Programming">FP</abbr> rabbit hole for a few years before eventually deciding that while there are benefits to programming in this paradigm, there are also some pretty big downsides.
   </p>
-
+<!--
   <p>
     I don't want to dwell on this pros and cons of FP for too long.
     A big promise of FP is that it enables greater abstraction capabilities which allow the programmer to focus on the problem rather than implementation details.
     The problem with this, in my opinion, is that it can sometimes inhibit understanding and reduce performance.
     It can also become a distraction.
-  </p>
+  </p> -->
 
   <p>
-    In this tutorial, I will assume you have some basic programming experience and a basic understanding of Haskell and it's syntax.
-    You should understand Haskell type signatures and function application syntax.
-    You should also understand basic Haskell typeclasses like <code>Eq</code> and <code>Monoid</code>.
-    You should be able to understand the C# examples if you've used any other object-oriented C-like language.
-  </p>
-
-  <p>
-    One of the most (in)famous abstractions provided by FP is the <code>Monad</code>.
-    Many have tried to explain monads in an easy to understand way.
+    Today, I want to focus on one of the most (in)famous abstractions provided by FP: the <code>Monad</code>.
+    <a href="https://wiki.haskell.org/Monad_tutorials_timeline" target="_blank">Many have tried to explain monads</a> in an easy to understand way.
     Many have failed and few have succeeded.
     In this article, I will try my hand at explaining them.
     I will provide code examples in Haskell and C#.
   </p>
 
+  <h3>Prerequisites</h3>
+  <p>
+    In this tutorial, I will assume you have some basic programming experience and a <a href="https://wiki.haskell.org/Learn_Haskell_in_10_minutes" target="_blank">basic understanding of Haskell and it's syntax</a>.
+    You should understand Haskell type signatures and function application syntax.
+    You should also understand basic Haskell typeclasses like <code>Eq</code> and <code>Monoid</code>.
+    You should be able to understand the C# examples if you've used any other object-oriented C-like language.
+  </p>
+
   <h3>Motivation</h3>
   <p>
     The first question to answer is "<i>Why Monads?</i>".
-    Monads were first borrowed from an area of math called Category Theory to enable <abbr title="Input/Output">I/O</abbr> in Haskell in a referentially transparent way.
+    Monads were <a href="https://dl.acm.org/doi/pdf/10.1145/158511.158524" target="_blank">first borrowed</a> from an area of math called Category Theory to enable <abbr title="Input/Output">I/O</abbr> in Haskell in a <a href="https://en.wikipedia.org/wiki/Referential_transparency" target="_blank">referentially transparent</a> way.
     Since there are no side effects in Haskell, the monad abstraction is used to build up a <i>sequence</i> of I/O operations without executing them until returning them from the <code>main</code> function.
     The key thing here is <i>sequence</i>.
     <b>Something is a Monad when you are able to string sequences of that thing together.</b>
-    So, the <code>IO</code> type in Haskell <i>is</i> a monad because of the ability to string a sequence of values of type <code>IO</code> together.
+    So, the <code>IO</code> type in Haskell <i>is</i> a monad because of the ability to string a sequence of values of type <code>IO a</code> together.
   </p>
 
   <p>
@@ -60,15 +63,20 @@ TODO:
 
   <h3>Functors</h3>
   <p>
-    <b>Something is a Functor when you are able to map a function over it.</b>
+    <b>Something is a Functor when you are able to <i>map</i> a function over it.</b>
+  </p>
 
+  <p>
     Some common examples are lists of items, an optional item, and I/O values, as mentioned above.
-    A good way to conceptualize a functor is as a container, however, you should know that this is a simplification.
+    A good way to conceptualize a functor is as a container.
+    However, you should know that this is a simplification.
     If you want to modify the items in the container without taking them out of the container, you can use the Functor's map function.
-    This function takes two parameters, the container containing items of type <code>a</code> and a function which converts the items inside the container from type <code>a</code> to type <code>b</code>.
+    This function takes two parameters: the container containing items of type <code>a</code> and a function which converts the items inside the container from type <code>a</code> to type <code>b</code>.
     The function returns a new container containing items of type <code>b</code>.
+  </p>
 
-    In Haskell this mapping function is called <code>fmap</code>. Here is the formal definition of a <code>Functor</code> in Haskell.
+  <p>
+    In Haskell this mapping function is called <code>fmap</code>. Here is the formal definition of the <code>Functor</code> typeclass in Haskell.
   </p>
 
   <code class="language-haskell">
@@ -82,9 +90,18 @@ class Functor f where
   </code>
 
   <p>
-    To let the Haskell compiler to know that a type is a <code>Functor</code>, you have to implement the <code>fmap</code> function.
-    You will also need to ensure that Functor laws are hold true for your implementation.
-    There is no way to enforce this in Haskell, so be careful.
+    The above is a simplified definition.
+    <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#Functor" target="_blank">Here</a> is the actual definition, if you're interested.
+  </p>
+
+  <p>
+    To let the Haskell compiler to know that a type is a <code>Functor</code>, you must implement the <code>fmap</code> function.
+    You will also need to ensure that the Functor laws hold true for your implementation.
+    The <i>laws</i> of a typeclass are just equations that are part of the mathematical definition of a typeclass.
+    There is no way to enforce laws at compile time in Haskell, so be careful.
+  </p>
+
+  <p>
     So, for the three common examples mentioned above, you would need to implement <code>fmap</code> for each, respectively.
   </p>
 
@@ -113,24 +130,32 @@ instance Functor IO where
   </code>
 
   <p>
-    I have left the instances unimplemented as exercise for the reader.
+    I have left the instances unimplemented as exercise (for <code>Maybe</code> and <code>List</code>, at least) for the reader.
+    Here are the implementations for
+    <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#line-1556" target="_blank">Maybe</a>,
+    <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#line-1733" target="_blank">List</a>,
+    and <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#line-2295" target="_blank">IO</a>.
     Now that the compiler knows that each of these types is a Functor, you can use <code>fmap</code> to apply a function to each item in each container.
   </p>
 
   <code class="language-haskell">
+-- The function to apply
 doubleValue :: Int -> Int
 doubleValue x = x*2
 ------------------------------------
+-- Maybe
 optional :: Maybe Int
 optional = Just 5
 
 fmap doubleValue optional -- Just 10
 ------------------------------------
+-- List
 list :: [Int]
 list = [1, 2, 3]
 
 fmap doubleValue list -- [2, 4, 6]
 ------------------------------------
+-- IO
 userVal :: IO Int
 userVal = readInt
 
@@ -152,7 +177,7 @@ doubleAll userVal -- doubles the value the user entered
   </code>
 
   <p>
-    You can do this in Haskell because of it's support for Higher-Kinded Types.
+    You can do this in Haskell because of it's support for <a href="https://serokell.io/blog/kinds-and-hkts-in-haskell" target="_blank">Higher-Kinded Types</a>.
     Functors are higher-kinded types, and so are Applicative Functors and Monads.
     While you can implement the mapping function in C# where it is called Select, you aren't able to write functions that operate on any Functor because of a lack of support for <abbr title="Higher-Kinded Types">HKTs</abbr>.
     The <a href="https://github.com/louthy/language-ext" target="_blank">language-ext</a> library attempts to do this in C#, but it is a lot more involved, and I don't recommend it.
@@ -190,7 +215,11 @@ static class FunctorExtensions {
   </code>
 
   <p>
-    C#'s <code>Task</code> type is similar to Haskell's <code>IO</code> type.
+    I have, again, left the instances unimplemented as exercise for the reader.
+  </p>
+
+  <p>
+    C#'s <code>Task</code> type behaves similarly to Haskell's <code>IO</code> type.
     This will become relevant later when I finally explain Monads.
   </p>
 
@@ -209,6 +238,7 @@ static class FunctorExtensions {
 
   <p>
     Before showing you the definition of Applicative Functors and Monads, I will show you their usage using Haskell's special <code>do</code> syntax.
+    <!-- TODO: explain do syntax -->
   </p>
 
   <code class="language-haskell">
@@ -224,7 +254,7 @@ result = do
 -- Monad
 safeDiv :: Int -> Int -> Maybe Int
 safeDiv _ 0 = Nothing
-safeDiv x y = Just (x / y)
+safeDiv x y = Just (div x y)
 
 result :: Maybe Int
 result = do
@@ -236,8 +266,8 @@ result = do
   </code>
 
   <p>
-    In the first example, each operation is independent, therefore it is only necessary that the <code>Maybe</code> type has the Applicative Functor instance implemented for it.
-    In the second example, the second operation depends on the first, therefore it is necessary that the <code>Maybe</code> type has the Monad instance implemented for it.
+    In the first example, each operation is independent, therefore it is only necessary that the <code>Maybe</code> type has the <code>Applicative Functor</code> instance implemented for it.
+    In the second example, the second operation depends on the first, therefore it is necessary that the <code>Maybe</code> type has the <code>Monad</code> instance implemented for it.
   </p>
 
   <p>
@@ -245,11 +275,11 @@ result = do
     This is true of Applicative Functors and Monads, since they are both Functors.
     However, it is better to view them as values with some associated context.
     To build up the operations, you need to define a way to combine the contexts.
-    You do this in Haskell by implementing the <code>Applicative</code> and <code>Monad</code> typeclasses, respectively.
+    You do this in Haskell by implementing the <code>Applicative</code> and <code>Monad</code> typeclasses.
   </p>
 
   <code class="language-haskell">
-class Functor m => Applicative m
+class Functor m => Applicative m where
   pure :: a -> m a
   ap :: m (a -> b) -> m a -> m b -- infix operator is <*>
 
@@ -259,7 +289,7 @@ class Functor m => Applicative m
 -- ap (ap (ap (pure (.)) u) v) w  = ap u (ap v w) -- Composition
 -- ap mf (pure v) == ap (pure (\f -> f v)) mf     -- Interchange
 
-class Applicative m => Monad m
+class Applicative m => Monad m where
   bind :: (a -> m b) -> m a -> m b -- infix operator is >>=
 
 -- Monad laws
@@ -270,10 +300,11 @@ class Applicative m => Monad m
 
   <p>
     I have taken liberties to simplify these definitions.
+    Here are the actual defintions for <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#Applicative" target="_blank">Applicative</a> and <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#Monad" target="_blank">Monad</a>.
   </p>
 
   <p>
-    I will implement all three typeclasses for <code>Maybe</code>, so you can see an example of how to combine the contexts.
+    I will now implement all three typeclasses for <code>Maybe</code>, so you can see an example of how to combine the contexts.
   </p>
 
   <code class="language-haskell">
@@ -290,8 +321,12 @@ instance Applicative Maybe where
 
 instance Monad Maybe where
   bind _ Nothing = Nothing
-  bind f (Just x) = Just (f x)
+  bind f (Just x) = f x
   </code>
+
+  <p>
+    Once again, here are the actual implementations of the <code>Maybe</code> <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#line-1556" target="_blank">instances</a> of <code>Functor</code>, <code>Applicative</code>, and <code>Monad</code>.
+  </p>
 
   <p>
     For the <code>Maybe</code> type, the context is presence or absence of a value.
@@ -306,7 +341,7 @@ instance Monad Maybe where
 
     <tbody>
       <tr><td>Identity</td><td>None</td></tr>
-      <tr><td>Maybe</td><td>Presence/Absence</td></tr>
+      <tr><td>Maybe</td><td>Presence/Absence of a value</td></tr>
       <tr><td>IO</td><td>Input/Output</td></tr>
       <tr><td>Reader</td><td>Configuration</td></tr>
       <tr><td>Writer</td><td>List of strings</td></tr>
@@ -318,7 +353,8 @@ instance Monad Maybe where
   </table>
 
   <p>
-    Here is the implementation of the three typeclasses for <code>Nullable&lt;T&gt;</code>, C#'s equivalent of <code>Maybe</code>.
+    Here is the implementation of the three typeclasses for <code>Nullable&lt;T&gt;</code>, C#'s equivalent of <code>Maybe a</code>.
+    Note that the C# code isn't perfectly analogous to Haskell.
   </p>
 
   <code class="language-csharp">
@@ -355,7 +391,7 @@ static class NullableInstances {
   <p>
     The <code>Select</code> method enables <code>Functor</code> like behavior and the two <code>SelectMany</code> overloads enable <code>Applicative</code> and <code>Monad</code> like behavior.
     C# actually has two special syntaxes for Monads.
-    Here is LINQ query syntax:
+    Here is <a href="https://learn.microsoft.com/en-us/dotnet/csharp/linq/" target="_blank">LINQ query syntax</a>:
   </p>
 
   <code class="language-csharp">
@@ -381,7 +417,7 @@ int? result =
   </code>
 
   <p>
-    And here is async/await syntax for monadic behavior for the <code>Task</code> and <code>ValueTask</code> types:
+    And here is <a href="https://learn.microsoft.com/en-us/dotnet/csharp/asynchronous-programming/" target="_blank">async/await syntax</a> for monadic behavior for the <code>Task</code> and <code>ValueTask</code> types:
   </p>
 
   <code class="language-csharp">
@@ -414,7 +450,7 @@ int result = b + 1;
     And that's pretty much it for an introduction to Monads.
     Now I want to give my opinion on when to use what you've learned from this article in practice.
     First, Functors are very useful and fairly ubiquitous.
-    Mapping over a sequence of values in a common operation in nearly every programming language, especially the ones that have generics.
+    Mapping over a sequence of values is a common operation in nearly every programming language, especially the ones that have generics.
     Basically, anytime I have a class with a type variable in C#, I implement the Select method because it's easy to implement and comes in handy frequently.
     In Haskell, it's even easier to implement because if there is only one option, you can use <code>deriving Functor</code> to automatically generate a Functor instance.
   </p>
@@ -426,58 +462,87 @@ int result = b + 1;
     When you create your own Monad in Haskell, you get lots of functions that automatically work with your type.
     You have to implement each one yourself in C#.
     <code>Task</code> and async/await are becoming more common in C#, and it's useful to know about their monadic structure.
+    As you may have noticed, Monads also have a viral quality to them, so once you start using them, they start spreading all over your program via the type system.
+    This makes them somewhat of a commitment once you start using them.
     That's pretty much the extent of my Monad use in C#.
     I think this would apply to similar statically typed, object-oriented languages.
     I should also mention Rust's error handling with it's <code>Option</code> and <code>Result</code> types is monadic.
   </p>
 
   <p>
-    In Haskell, you are forced to do I/O inside the IO monad, at least at the top level of your program.
-    However, in larger programs, it is generally frowned upon to have all of the different types of I/O directly under IO.
+    In Haskell, you are forced to do I/O inside the <code>IO</code> monad, at least at the top level of your program.
+    However, in larger programs, it is generally frowned upon to have all of the different types of I/O directly under <code>IO</code>.
     The reason it is frowned upon is because you generally want static type safety, especially if you are using Haskell.
     Throwing everything into <code>IO</code> is kind of like having dynamic typing for side effects.
     Imagine you have a function with this type signature: <code>getData :: String -&gt; IO ResultType</code>
-    Where does it get the data from? console, file, database, http request
+    Where does it get the data from?
+    The console, a file, a SQL database call, an HTTP request?
+  </p>
+
+  <p>
     There are many solutions to this problem in Haskell, and, in my opinion, none of them are good enough.
+    Here is a table containing my view of the state of all of the solutions for dealing with effects in Haskell.
   </p>
 
   <table>
     <thead>
-      <!-- <tr><th>Technique</th><th>Pros</th><th>Cons</th></tr> -->
-      <tr><th>Technique</th><th>Description</th><th>Performance</th><th>Boilerplate</th><th>Ergonomics</th><th>Maturity</th></tr>
+      <tr>
+        <th>Technique</th><th>Description</th><th>Libraries</th>
+        <th><abbr title="Performance">Perf.</abbr></th>
+        <th><abbr title="Boilerplate">BP</abbr></th>
+        <th><abbr title="Ergonomics">Ergo.</abbr></th>
+        <th><abbr title="Maturity">Mat.</abbr></th>
+      </tr>
     </thead>
 
     <tbody>
       <tr>
-        <td>IO</td><td>Everything</td>
+        <td>IO</td><td>Everything in IO</td>
+        <td><a href="https://hackage.haskell.org/package/ghc-prim" target="_blank">ghc-prim</a></td>
         <td style="text-align:center">🥇</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td><td style="text-align:center">🥇</td>
       </tr>
       <tr>
-        <td>transformers stack</td><td>build up a stack and write polymorphic functions</td>
+        <td><a href="https://www.williamyaoh.com/posts/2023-06-10-monad-transformers-101.html" target="_blank">Transformers stack</a></td>
+        <td>build up a stack and write polymorphic functions</td>
+        <td><a href="https://hackage.haskell.org/package/transformers" target="_blank">transformers</a> + <a href="https://hackage.haskell.org/package/mtl" target="_blank">mtl</a></td>
         <td style="text-align:center">🥉</td><td style="text-align:center">🥇</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td>
       </tr>
       <tr>
-        <td>Free Monads</td><td>...</td>
+        <td><a href="https://serokell.io/blog/introduction-to-free-monads" target="_blank">Free Monads</a></td>
+        <td>Build abstract syntax tree of effects</td>
+        <td><a href="https://hackage.haskell.org/package/free" target="_blank">free</a></td>
         <td style="text-align:center">🥈</td><td style="text-align:center">🥉</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td>
       </tr>
       <tr>
-        <td>effect systems</td><td>...</td>
-        <td style="text-align:center">🥈</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td>
-      </tr>
-      <tr>
-        <td>ReaderT Env IO</td><td>...</td>
+        <td><a href="https://academy.fpblock.com/blog/2017/06/readert-design-pattern/">ReaderT Env IO</a></td>
+        <td>Pass environment with effects through program</td>
+        <td><a href="https://hackage-content.haskell.org/package/transformers-0.6.2.0/docs/Control-Monad-Trans-Reader.html" target="_blank">ReaderT</a> from <a href="https://hackage.haskell.org/package/transformers" target="_blank">transformers</a></td>
         <td style="text-align:center">🥇</td><td style="text-align:center">🥈</td><td style="text-align:center">🥈</td><td style="text-align:center">🥈</td>
       </tr>
       <tr>
-        <td>Custom Monad</td><td>...</td>
-        <td style="text-align:center">🥈</td><td style="text-align:center">🥉</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td>
+        <td>Effect systems</td>
+        <td>Type-level tracking of effects</td>
+        <td>
+          <a href="https://hackage.haskell.org/package/extensible-effects" target="_blank">extensible-effects</a>,
+          <a href="https://hackage.haskell.org/package/freer-simple" target="_blank">freer-simple</a>,
+          <a href="https://hackage.haskell.org/package/fused-effects" target="_blank">fused-effects</a>,
+          <a href="https://hackage.haskell.org/package/polysemy" target="_blank">polysemy</a>,
+          <a href="https://hackage.haskell.org/package/effectful" target="_blank">effectful</a>
+        </td>
+        <td style="text-align:center">🥈</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td>
       </tr>
       <tr>
-        <td>Scala ZIO like</td><td>...</td>
+        <td><a href="https://github.com/zio/zio" target="_blank">Scala ZIO</a> like</td><td>FP ecosystem in Scala, rio was closest in Haskell</td><td><a href="https://hackage.haskell.org/package/rio" target="_blank">rio</a></td>
         <td style="text-align:center">🥇</td><td style="text-align:center">🥇</td><td style="text-align:center">🥇</td><td style="text-align:center">❌</td>
       </tr>
     </tbody>
   </table>
+
+  <p>
+    I haven't really followed Haskell for about 6 years, so take what I have to say on this topic with a grain of salt.
+    In my research for this article, I found a new Effects library called <a href="https://github.com/haskell-effectful/effectful">effectful</a>.
+    It seems to have the most activity surrounding it.
+  </p>
 
   <p>
     Finally, don't worry too much about monads.
