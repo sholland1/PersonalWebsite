@@ -1,17 +1,7 @@
 <!--
 title: Monad Tutorial
+date_published: 2025-06-27
 tags: functional_programming
--->
-<!--
-TODO:
-  [x] add more links
-  [x] improve table formatting
-  [x] disclose all simplifications and add links to actual code
-  [x] make sure code examples compile
-  [y] add more info about effect systems
-    - find blog post for Effect systems
-  [ ] talk a little more about pros and cons of FP
-  [ ] finish conclusion
 -->
 <article>
   <p>
@@ -19,13 +9,6 @@ TODO:
     I started with <abbr title="Language INtegrated Query">LINQ</abbr> and immutability in .NET, but I quickly found <a href="https://en.wikipedia.org/wiki/Haskell" target="_blank">Haskell</a>.
     I explored the <abbr title="Functional Programming">FP</abbr> rabbit hole for a few years before eventually deciding that while there are benefits to programming in this paradigm, there are also some pretty big downsides.
   </p>
-<!--
-  <p>
-    I don't want to dwell on this pros and cons of FP for too long.
-    A big promise of FP is that it enables greater abstraction capabilities which allow the programmer to focus on the problem rather than implementation details.
-    The problem with this, in my opinion, is that it can sometimes inhibit understanding and reduce performance.
-    It can also become a distraction.
-  </p> -->
 
   <p>
     Today, I want to focus on one of the most (in)famous abstractions provided by FP: the <code>Monad</code>.
@@ -46,7 +29,9 @@ TODO:
   <h3>Motivation</h3>
   <p>
     The first question to answer is "<i>Why Monads?</i>".
-    Monads were <a href="https://dl.acm.org/doi/pdf/10.1145/158511.158524" target="_blank">first borrowed</a> from an area of math called Category Theory to enable <abbr title="Input/Output">I/O</abbr> in Haskell in a <a href="https://en.wikipedia.org/wiki/Referential_transparency" target="_blank">referentially transparent</a> way.
+    Monads were <a href="https://dl.acm.org/doi/pdf/10.1145/158511.158524" target="_blank">first borrowed</a> from an area of math called
+    <a href="https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/" target="_blank">Category Theory</a> to enable <abbr title="Input/Output">I/O</abbr> in Haskell in a
+    <a href="https://en.wikipedia.org/wiki/Referential_transparency" target="_blank">referentially transparent</a> way.
     Since there are no side effects in Haskell, the monad abstraction is used to build up a <i>sequence</i> of I/O operations without executing them until returning them from the <code>main</code> function.
     The key thing here is <i>sequence</i>.
     <b>Something is a Monad when you are able to string sequences of that thing together.</b>
@@ -57,9 +42,11 @@ TODO:
     Before I explain Monads, I need to explain two other abstractions that Monads are built upon: <code>Functors</code> and <code>Applicative Functors</code>
     This is necessary because every <code>Monad</code> is also an <code>Applicative Functor</code> and a <code>Functor</code>, and every <code>Applicative Functor</code> is a <code>Functor</code>.
     Each abstraction builds on the next.
-    Functor -&gt; Applicative Functor -&gt; Monad
-    Also, Functors are much easier to understand.
   </p>
+
+  <p>Functor → Applicative Functor → Monad</p>
+
+  <p>Also, Functors are much easier to understand.</p>
 
   <h3>Functors</h3>
   <p>
@@ -209,7 +196,7 @@ static class FunctorExtensions {
     IEnumerable<int> items = [1, 2, 3];
     items.Select(DoubleValue); // [2, 4, 6]
 
-    Task<int> taskValue = Task.FromResult(5);
+    Task<int> taskValue = Get5FromDBAsync();
     await taskValue.Select(DoubleValue); // 10
 }
   </code>
@@ -238,7 +225,10 @@ static class FunctorExtensions {
 
   <p>
     Before showing you the definition of Applicative Functors and Monads, I will show you their usage using Haskell's special <code>do</code> syntax.
-    <!-- TODO: explain do syntax -->
+    In Haskell, <code>do</code> notation is special syntax that makes working with Applicative Functors and Monads more readable. 
+    It allows you to write sequences of operations in a more imperative style, even though under the hood it's translated to normal function calls.
+    The left arrow <code>&lt;-</code> extracts a value from its context, and <code>pure</code> wraps a value in a context.
+    Here are examples showing both Applicative Functors and Monads:
   </p>
 
   <code class="language-haskell">
@@ -300,7 +290,7 @@ class Applicative m => Monad m where
 
   <p>
     I have taken liberties to simplify these definitions.
-    Here are the actual defintions for <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#Applicative" target="_blank">Applicative</a> and <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#Monad" target="_blank">Monad</a>.
+    Here are the actual definitions for <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#Applicative" target="_blank">Applicative</a> and <a href="https://hackage.haskell.org/package/ghc-internal-9.1201.0/docs/src/GHC.Internal.Base.html#Monad" target="_blank">Monad</a>.
   </p>
 
   <p>
@@ -391,7 +381,7 @@ static class NullableInstances {
   <p>
     The <code>Select</code> method enables <code>Functor</code> like behavior and the two <code>SelectMany</code> overloads enable <code>Applicative</code> and <code>Monad</code> like behavior.
     C# actually has two special syntaxes for Monads.
-    Here is <a href="https://learn.microsoft.com/en-us/dotnet/csharp/linq/" target="_blank">LINQ query syntax</a>:
+    The first, <a href="https://learn.microsoft.com/en-us/dotnet/csharp/linq/" target="_blank">LINQ query syntax</a>, is similar to Haskell's <code>do</code> syntax:
   </p>
 
   <code class="language-csharp">
@@ -422,19 +412,19 @@ int? result =
 
   <code class="language-csharp">
 // Applicative Functor
-int a = await Task.FromResult(2);
-int b = await Task.FromResult(3);
+int a = await Get2FromDBAsync();
+int b = await Get3FromDBAsync();
 int result = a + b;
 
 // int result == 5
 
 // Monad
 // Simulating a lookup over the network
-static async Task<int> lookupAsync(int x) => await Task.FromResult(x * 2);
+static async Task<int> LookupAsync(int x) => await Task.FromResult(x * 2);
 
 //result :: Maybe Int
-int a = await Task.FromResult(10);
-int b = await lookupAsync(a); // this line depends on the previous
+int a = await Get10FromDBAsync();
+int b = await LookupAsync(a); // this line depends on the previous
 int result = b + 1;
 
 // int result == 21
@@ -445,14 +435,14 @@ int result = b + 1;
     I hope you get the idea from these simplified examples.
   </p>
 
-  <h3>Conclusion</h3>
+  <h3>Practical application</h3>
   <p>
     And that's pretty much it for an introduction to Monads.
     Now I want to give my opinion on when to use what you've learned from this article in practice.
     First, Functors are very useful and fairly ubiquitous.
     Mapping over a sequence of values is a common operation in nearly every programming language, especially the ones that have generics.
-    Basically, anytime I have a class with a type variable in C#, I implement the Select method because it's easy to implement and comes in handy frequently.
-    In Haskell, it's even easier to implement because if there is only one option, you can use <code>deriving Functor</code> to automatically generate a Functor instance.
+    Basically, anytime I have a class with a type variable in C#, I implement the <code>Select</code> method because it's easy to implement and comes in handy frequently.
+    In Haskell, it's even easier to implement <code>fmap</code> because if there is only one option, you can use <code>deriving Functor</code> to automatically generate a Functor instance.
   </p>
 
   <p>
@@ -461,7 +451,7 @@ int result = b + 1;
     Creating your own Monad isn't nearly as useful in C# because of the lack of HKT.
     When you create your own Monad in Haskell, you get lots of functions that automatically work with your type.
     You have to implement each one yourself in C#.
-    <code>Task</code> and async/await are becoming more common in C#, and it's useful to know about their monadic structure.
+    <code>Task</code> and <code>async/await</code> are becoming more common in C#, and it's useful to know about their monadic structure.
     As you may have noticed, Monads also have a viral quality to them, so once you start using them, they start spreading all over your program via the type system.
     This makes them somewhat of a commitment once you start using them.
     That's pretty much the extent of my Monad use in C#.
@@ -472,15 +462,16 @@ int result = b + 1;
   <p>
     In Haskell, you are forced to do I/O inside the <code>IO</code> monad, at least at the top level of your program.
     However, in larger programs, it is generally frowned upon to have all of the different types of I/O directly under <code>IO</code>.
-    The reason it is frowned upon is because you generally want static type safety, especially if you are using Haskell.
+    It is frowned upon because you generally want static type safety, especially if you are using Haskell.
     Throwing everything into <code>IO</code> is kind of like having dynamic typing for side effects.
-    Imagine you have a function with this type signature: <code>getData :: String -&gt; IO ResultType</code>
+    Imagine you have a function with this type signature: <code>getData :: String -&gt; IO ResultType</code>.
     Where does it get the data from?
-    The console, a file, a SQL database call, an HTTP request?
+    The console, a file, a SQL database query, an HTTP request?
   </p>
 
   <p>
     There are many solutions to this problem in Haskell, and, in my opinion, none of them are good enough.
+    I haven't really followed Haskell for about 6 years, though, so take what I have to say on this topic with a grain of salt.
     Here is a table containing my view of the state of all of the solutions for dealing with effects in Haskell.
   </p>
 
@@ -503,7 +494,7 @@ int result = b + 1;
       </tr>
       <tr>
         <td><a href="https://www.williamyaoh.com/posts/2023-06-10-monad-transformers-101.html" target="_blank">Transformers stack</a></td>
-        <td>build up a stack and write polymorphic functions</td>
+        <td>Build up a stack and write polymorphic functions</td>
         <td><a href="https://hackage.haskell.org/package/transformers" target="_blank">transformers</a> + <a href="https://hackage.haskell.org/package/mtl" target="_blank">mtl</a></td>
         <td style="text-align:center">🥉</td><td style="text-align:center">🥇</td><td style="text-align:center">🥈</td><td style="text-align:center">🥇</td>
       </tr>
@@ -520,8 +511,8 @@ int result = b + 1;
         <td style="text-align:center">🥇</td><td style="text-align:center">🥈</td><td style="text-align:center">🥈</td><td style="text-align:center">🥈</td>
       </tr>
       <tr>
-        <td>Effect systems</td>
-        <td>Type-level tracking of effects</td>
+        <td><a href="https://hackage-content.haskell.org/package/effectful-core-2.6.0.0/docs/Effectful-Dispatch-Dynamic.html" target="_blank">Effect systems</a></td>
+        <td>Define effects and corresponding handlers</td>
         <td>
           <a href="https://hackage.haskell.org/package/extensible-effects" target="_blank">extensible-effects</a>,
           <a href="https://hackage.haskell.org/package/freer-simple" target="_blank">freer-simple</a>,
@@ -539,13 +530,19 @@ int result = b + 1;
   </table>
 
   <p>
-    I haven't really followed Haskell for about 6 years, so take what I have to say on this topic with a grain of salt.
-    In my research for this article, I found a new Effects library called <a href="https://github.com/haskell-effectful/effectful">effectful</a>.
-    It seems to have the most activity surrounding it.
+    As you can see, there are pros and cons to each solution and no definitively superior choice.
+    In my research for this article, I came across a new effect system library called <a href="https://github.com/haskell-effectful/effectful">effectful</a>.
+    It seems to have the most activity surrounding it and seems to be the preferred solution at the moment.
   </p>
 
+  <h3>Conclusion</h3>
   <p>
-    Finally, don't worry too much about monads.
-    Focus on build something cool.
+    In conclusion, I don't think Monads are a great solution to the problem of I/O in pure functional programming, but it is good to understand them, since they pop up here and there in more popular programming languages.
+    Functional programming brings some good ideas to the table, but it isn't a pure win that some make it out to be.
+    Greater abstraction capabilities come at the cost of low-level understanding and, as currently implemented, runtime and compiler performance.
+    Ironically, it can also become a distraction from the task at hand.
+    Maybe, in the future, we will get to a solution that makes this way of programming much better than the alternatives, but we sadly aren't there yet.
   </p>
+
+  <p>My advice is to focus on building something cool no matter the tool, language, or paradigm and to not get too caught up in the hype.</p>
 </article>
