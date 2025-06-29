@@ -1,9 +1,8 @@
+node_modules
 output
 scratch
 work
+.netlify
 .zed
 Notes.md
 *.vim
-
-# Local Netlify folder
-.netlify

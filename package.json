@@ -1,0 +1,16 @@
+{
+  "name": "personal-website",
+  "version": "1.0.0",
+  "description": "This is the static site generator for my personal website, mydumbsite.net.",
+  "main": "main.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sholland1/PersonalWebsite.git"
+  },
+  "author": "Seth Holland",
+  "license": "CC BY-SA 4.0",
+  "bugs": {
+    "url": "https://github.com/sholland1/PersonalWebsite/issues"
+  },
+  "homepage": "https://github.com/sholland1/PersonalWebsite#readme"
+}
