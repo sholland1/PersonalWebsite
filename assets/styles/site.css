@@ -199,7 +199,6 @@ video, .video {
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
 }
 
-
 table {
   border-collapse: collapse;
   width: 100%;
@@ -212,14 +211,19 @@ th, td {
   text-align: left;
 }
 
-/* th {
-  background-color: #f5f5f5;
-  font-weight: bold;
+th {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 tbody tr:nth-child(even) {
-  background-color: #fafafa;
-} */
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.scroll-h {
+  overflow-x: auto;
+  display: block;
+  margin-bottom: 0;
+}
 
 /* BELOW THIS POINT IS MEDIA QUERY */
 
