@@ -21,12 +21,13 @@ const blogIndexParams = createIndexParams("Blog Index", "blog/index.html", blogP
 const topLevelParams = await Array.fromAsync(processBlogFiles("pages/*.html"));
 const rankingsParams = await Array.fromAsync(processRankingsFiles());
 const rankingsIndexParams = createIndexParams("Game Rankings Index", "game-rankings/index.html", rankingsParams);
+const animalsParams = await processAnimalPics("assets/images/animals");
 // const quotesParams = await processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
 
 const siteParams: SiteParams = {
     Blog: blogParams,
     GameRankings: rankingsParams,
-    TopLevel: topLevelParams //[quotesParams, ...topLevelParams],
+    TopLevel: [animalsParams, ...topLevelParams],
 };
 
 console.log("Creating nav...");
@@ -154,11 +155,41 @@ async function* processRankingsFiles() {
         const fileInfo = await Deno.stat(file.path);
         yield {
             title: `My Ranking of the ${file.name.replace('.txt', '').replace('Rankings', '')} Games`,
-            date_updated: getModifiedDate(fileInfo),
+            date_updated: getModifiedDate(fileInfo.mtime),
             content: `<ol>${lines.map(line => `<li>${line.trim()}</li>`).join('\n')}</ol>`,
             tags: ['fun'],
             path: `game-rankings/${file.name.replace('Rankings.txt', '.html')}`,
         };
+    }
+}
+
+async function processAnimalPics(imageDir: string) {
+    const imageFiles = await Array.fromAsync(Deno.readDir(imageDir)).then(files => files.sort((a, b) => a.name.localeCompare(b.name))
+    );
+    const imageTags: string[] = [];
+    let latestModified: Date | null = null;
+
+    imageTags.push(`<div class="img-container">`);
+    for (const entry of imageFiles) {
+        if (entry.isFile && entry.name.endsWith('.jpg')) {
+            const imagePath = `${imageDir}/${entry.name}`;
+            const fileInfo = await Deno.stat(imagePath);
+            if (!latestModified || fileInfo.mtime && fileInfo.mtime > latestModified) {
+                latestModified = fileInfo.mtime;
+            }
+
+            const altText = entry.name.substring(3).replace('.jpg', '');
+            imageTags.push(`<img src="${imagePath}" alt="${altText}">`);
+        }
+    }
+    imageTags.push(`</div>`);
+
+    return {
+        title: 'Animal Photos',
+        date_updated: getModifiedDate(latestModified),
+        content: `<article>${imageTags.join('\n')}</article>`,
+        tags: ['fun'],
+        path: 'animals.html',
     }
 }
 
@@ -168,15 +199,15 @@ async function processQuotesFile(quotesFile: string) {
     const fileInfo = await Deno.stat(quotesFile);
     return {
         title: 'Quotes',
-        date_updated: getModifiedDate(fileInfo),
+        date_updated: getModifiedDate(fileInfo.mtime),
         content: `<div>${lines.map(line => `<p>${line.trim()}</p>`).join('\n')}</div>`,
         tags: ['fun'],
         path: 'quotes.html',
     };
 }
 
-function getModifiedDate(fileInfo: Deno.FileInfo) {
-    return fileInfo.mtime?.toISOString().split('T')[0] || "";
+function getModifiedDate(d: Date | null): string {
+    return d?.toISOString().split('T')[0] || "";
 }
 
 async function highlightCodeBlocks(content: string): Promise<string> {
