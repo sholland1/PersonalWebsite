@@ -135,9 +135,8 @@ footer {
   background-color: var(--footer-bg);
 }
 
-h1 {
-  font-size: 55px;
-}
+h1 { font-size: 3em }
+h2 { margin: .7em 0 }
 
 h1, h2, h3, h4, h5, h6 {
   color: var(--big-text-color);
@@ -240,9 +239,7 @@ tbody tr:nth-child(even) {
     flex-wrap: wrap;
   }
 
-  h1 {
-    font-size: 44px;
-  }
+  h1 { font-size: 2.7em }
 
   main {
     order: 1;
