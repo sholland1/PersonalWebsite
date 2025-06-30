@@ -11,6 +11,7 @@ import { codeToHtml } from "npm:shiki";
 const OUTPUT_DIR = "output";
 const NOTES_DIR = "../../OneDrive/Documents/Notes"
 const TEMPLATE_FILE = "template.html";
+const HIGHLIGHT_FILE = "highlight_template.html";
 
 const base_url = Deno.args[0];
 
@@ -34,6 +35,9 @@ console.log("Creating nav...");
 const nav_content = generateNavHtml(siteParams).join('\n');
 // console.log(nav_content);
 
+console.log("Creating highlight html...");
+const highlight_html = ''; //await Deno.readTextFile(HIGHLIGHT_FILE);
+
 console.log("Emptying output directory...");
 await emptyDir(OUTPUT_DIR);
 
@@ -42,6 +46,7 @@ const allParams = [...Object.values(siteParams).flat(), blogIndexParams, ranking
     ...params,
     nav_content,
     current_year: new Date().getFullYear(),
+    highlight_html,
     base_url,
 }));
 
