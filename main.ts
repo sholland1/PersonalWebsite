@@ -103,7 +103,7 @@ async function* processBlogFiles(glob: string) {
     }
 }
 
-function createIndexParams(title: string, path: string, params: Array<{ title: string; date_published: string | null; date_updated: string | null; path: string }>) {
+function createIndexParams(title: string, path: string, params: Array<ArticleParams>): { title: string; path: string; content: string; } {
     params.sort(flip(compareByDate));
     return {
         title, path,
@@ -111,7 +111,7 @@ function createIndexParams(title: string, path: string, params: Array<{ title: s
     };
 }
 
-async function parseArticle(articleText: string, path: string) {
+async function parseArticle(articleText: string, path: string): Promise<ArticleParams> {
     /* Format of Article
 <!--
 title: Blog 1
@@ -147,7 +147,7 @@ tags: a, b, c
     };
 }
 
-async function* processRankingsFiles() {
+async function* processRankingsFiles(): AsyncGenerator<ArticleParams> {
     const files = await Array.fromAsync(expandGlob(`${NOTES_DIR}/*Rankings.txt`));
     for (const file of files) {
         const rankingText = await Deno.readTextFile(file.path);
@@ -155,6 +155,7 @@ async function* processRankingsFiles() {
         const fileInfo = await Deno.stat(file.path);
         yield {
             title: `My Ranking of the ${file.name.replace('.txt', '').replace('Rankings', '')} Games`,
+            date_published: null,
             date_updated: getModifiedDate(fileInfo.mtime),
             content: `<ol>${lines.map(line => `<li>${line.trim()}</li>`).join('\n')}</ol>`,
             tags: ['fun'],
@@ -163,9 +164,9 @@ async function* processRankingsFiles() {
     }
 }
 
-async function processAnimalPics(imageDir: string) {
-    const imageFiles = await Array.fromAsync(Deno.readDir(imageDir)).then(files => files.sort((a, b) => a.name.localeCompare(b.name))
-    );
+async function processAnimalPics(imageDir: string): Promise<ArticleParams> {
+    const imageFiles = await Array.fromAsync(Deno.readDir(imageDir))
+        .then(files => files.sort((a, b) => a.name.localeCompare(b.name)));
     const imageTags: string[] = [];
     let latestModified: Date | null = null;
 
@@ -187,19 +188,21 @@ async function processAnimalPics(imageDir: string) {
     return {
         title: 'Animal Photos',
         date_updated: getModifiedDate(latestModified),
+        date_published: null,
         content: `<article>${imageTags.join('\n')}</article>`,
         tags: ['fun'],
         path: 'animals.html',
     }
 }
 
-async function processQuotesFile(quotesFile: string) {
+async function processQuotesFile(quotesFile: string): Promise<ArticleParams> {
     const quotesText = await Deno.readTextFile(quotesFile);
     const lines = quotesText.split('\n').filter(line => line.trim() !== '');
     const fileInfo = await Deno.stat(quotesFile);
     return {
         title: 'Quotes',
         date_updated: getModifiedDate(fileInfo.mtime),
+        date_published: null,
         content: `<div>${lines.map(line => `<p>${line.trim()}</p>`).join('\n')}</div>`,
         tags: ['fun'],
         path: 'quotes.html',
@@ -249,4 +252,13 @@ function compareByDate(a: { date_published: string | null, date_updated: string 
 
 function flip<T, U>(f: (a: T, b: T) => U): (a: T, b: T) => U {
     return (a, b) => f(b, a);
+}
+
+interface ArticleParams {
+    title: string;
+    date_published: string | null;
+    date_updated: string | null;
+    content: string;
+    tags: string[];
+    path: string;
 }
