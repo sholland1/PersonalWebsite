@@ -27,23 +27,21 @@
           {{{nav_content}}}
         </nav>
 
-        <h2>Box</h2>
-        <div class="box">
-          <p>lorum ipsum</p>
-        </div>
+        {{{highlight_html}}}
       </aside>
 
       <main>
           <h2>{{title}}</h2>
           {{#if date_published}}
-          <h4>Date Published: {{date_published}}</h4>
+          <time datetime="{{date_published}}">Date Published: {{date_published}}</time>
           {{/if}}
           {{#if date_updated}}
-          <h4>Last Updated: {{date_updated}}</h4>
+          <time datetime="{{date_updated}}">Last Updated: {{date_updated}}</time>
           {{/if}}
 {{{content}}}
-      </main>
 
+          {{{highlight_html}}}
+      </main>
     </div>
 
     <footer class="footer">
