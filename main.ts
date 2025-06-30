@@ -31,8 +31,8 @@ const siteParams: SiteParams = {
 };
 
 console.log("Creating nav...");
-const navHtml = generateNavHtml(siteParams).join('\n');
-// console.log(navHtml);
+const nav_content = generateNavHtml(siteParams).join('\n');
+// console.log(nav_content);
 
 console.log("Emptying output directory...");
 await emptyDir(OUTPUT_DIR);
@@ -40,7 +40,7 @@ await emptyDir(OUTPUT_DIR);
 console.log("Adding nav to template...");
 const allParams = [...Object.values(siteParams).flat(), blogIndexParams, rankingsIndexParams].map(params => ({
     ...params,
-    nav_content: navHtml,
+    nav_content,
     current_year: new Date().getFullYear(),
     base_url,
 }));
@@ -59,12 +59,6 @@ for (const params of allParams) {
 
 console.log("Copying assets...");
 await copy("assets", `${OUTPUT_DIR}/assets`);
-
-interface SiteParams {
-    Blog: Array<{ path: string; title: string }>;
-    GameRankings: Array<{ path: string }>;
-    TopLevel: Array<{ path: string; title: string }>;
-}
 
 function generateNavHtml(siteParams: SiteParams): string[] {
     console.log(`Processing Blog`);
@@ -261,4 +255,10 @@ interface ArticleParams {
     content: string;
     tags: string[];
     path: string;
+}
+
+interface SiteParams {
+    Blog: Array<{ path: string; title: string }>;
+    GameRankings: Array<{ path: string }>;
+    TopLevel: Array<{ path: string; title: string }>;
 }
