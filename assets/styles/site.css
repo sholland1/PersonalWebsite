@@ -275,7 +275,7 @@ time {
     gap: 0;
   }
 
-  .header, aside, main, .footer {
+  .header, aside, main, footer {
     box-shadow: none;
   }
 }
