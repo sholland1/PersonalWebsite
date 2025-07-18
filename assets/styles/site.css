@@ -236,6 +236,10 @@ time {
   color: var(--color-mustard-yellow);
 }
 
+abbr {
+  cursor: help;
+}
+
 /* BELOW THIS POINT IS MEDIA QUERY */
 @media (max-width: 1200px) { .img-container { columns: 2 } }
 @media (max-width: 450px) { .img-container { columns: 1 } }
