@@ -34,12 +34,6 @@
   background-color: var(--highlight-color);
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  box-sizing: border-box;
-}
-
 body {
   display: flex;
   flex-direction: column;
@@ -48,6 +42,9 @@ body {
   font-family: serif;
   color: var(--text-color);
   background: var(--body-bg) var(--body-bg-image) fixed;
+
+  margin: 0;
+  box-sizing: border-box;
 
   a {
     cursor: var(--cursor-image), auto;
