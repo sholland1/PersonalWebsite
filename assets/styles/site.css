@@ -46,10 +46,8 @@ body {
   min-height: 100vh;
 
   font-family: serif;
-  background-color: var(--body-bg);
   color: var(--text-color);
-  background-image: var(--body-bg-image);
-  background-attachment: fixed;
+  background: var(--body-bg) var(--body-bg-image) fixed;
 
   a {
     cursor: var(--cursor-image), auto;
@@ -79,13 +77,11 @@ ul {
 }
 
 .header {
-  background: #333;
   color: white;
   text-align: center;
   margin-bottom: 1em;
 
   background-color: var(--header-bg);
-  background-image: var(--header-image);
 }
 
 .container {
@@ -128,7 +124,6 @@ main {
 footer {
   font-family: sans-serif;
 
-  background: #333;
   color: white;
   text-align: center;
 
