@@ -49,5 +49,15 @@
       Content licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
     </footer>
   </div>
+
+  <script type="speculationrules">
+    {
+      "prefetch": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }],
+      "prerender": [{ "where": { "and": [
+        { "href_matches": "/*" },
+        { "not": { "href_matches": "/animals.html" } }
+      ] }, "eagerness": "moderate" }]
+    }
+  </script>
 </body>
 </html>
