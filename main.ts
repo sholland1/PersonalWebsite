@@ -211,14 +211,15 @@ async function processQuotesFile(quotesFile: string): Promise<ArticleParams> {
 }
 
 function createRssFeed(articleParams: ArticleParams[]): string {
-    const header = `<rss version="2.0">
+    const header = `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
   <title>Seth Holland's Blog</title>
   <link>${base_url}/blog/index.html</link>
   <description>Latest posts from my blog</description>
   <generator>Custom: github.com/sholland1/PersonalWebsite</generator>
   <copyright>Copyright © ${new Date().getFullYear()} Seth Holland</copyright>
-  <language>en-us</language>`;
+  <language>en-us</language>
+  <atom:link href="${base_url}/rss.xml" rel="self" type="application/rss+xml"/>`;
 
     const items = [];
     for (const params of articleParams) {
@@ -226,6 +227,7 @@ function createRssFeed(articleParams: ArticleParams[]): string {
   <item>
     <title>${params.title}</title>
     <link>${base_url}/${params.path}</link>
+    <guid>${base_url}/${params.path}</guid>
     <pubDate>${new Date(params.date_published!).toUTCString()}</pubDate>
   </item>`);
     }
