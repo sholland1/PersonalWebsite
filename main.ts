@@ -24,6 +24,7 @@ const rankingsParams = await Array.fromAsync(processRankingsFiles());
 const rankingsIndexParams = createIndexParams("Game Rankings Index", "game-rankings/index.html", rankingsParams);
 const animalsParams = await processAnimalPics("assets/images/animals");
 // const quotesParams = await processQuotesFile(`${NOTES_DIR}/Quotes.txt`);
+const rssFeed = createRssFeed(blogParams);
 
 const siteParams: SiteParams = {
     Blog: blogParams,
@@ -61,6 +62,7 @@ for (const params of allParams) {
     await ensureDir(outputFilename.substring(0, outputFilename.lastIndexOf('/')));
     await Deno.writeTextFile(outputFilename, template(params));
 }
+await Deno.writeTextFile(`${OUTPUT_DIR}/rss.xml`, rssFeed);
 
 console.log("Copying assets...");
 await copy("assets", `${OUTPUT_DIR}/assets`);
@@ -206,6 +208,31 @@ async function processQuotesFile(quotesFile: string): Promise<ArticleParams> {
         tags: ['fun'],
         path: 'quotes.html',
     };
+}
+
+function createRssFeed(articleParams: ArticleParams[]): string {
+    const header = `<rss version="2.0">
+<channel>
+  <title>Seth Holland's Blog</title>
+  <link>${base_url}/blog/index.html</link>
+  <description>Latest posts from my blog</description>
+  <generator>Custom: github.com/sholland1/PersonalWebsite</generator>
+  <copyright>Copyright © ${new Date().getFullYear()} Seth Holland</copyright>
+  <language>en-us</language>`;
+
+    const items = [];
+    for (const params of articleParams) {
+        items.push(`
+  <item>
+    <title>${params.title}</title>
+    <link>${base_url}/${params.path}</link>
+    <pubDate>${new Date(params.date_published!).toUTCString()}</pubDate>
+  </item>`);
+    }
+
+    return header + items.join('\n') + `
+</channel>
+</rss>`;
 }
 
 function getModifiedDate(d: Date | null): string {
