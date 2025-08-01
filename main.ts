@@ -57,11 +57,12 @@ const templateText = await Deno.readTextFile(TEMPLATE_FILE);
 const template = Handlebars.compile(templateText);
 
 for (const params of allParams) {
-    console.log(`Generating ${params.path}`);
+    console.log(`Writing ${params.path}`);
     const outputFilename = `${OUTPUT_DIR}/${params.path}`;
     await ensureDir(outputFilename.substring(0, outputFilename.lastIndexOf('/')));
     await Deno.writeTextFile(outputFilename, template(params));
 }
+console.log(`Writing rss.xml`);
 await Deno.writeTextFile(`${OUTPUT_DIR}/rss.xml`, rssFeed);
 
 console.log("Copying assets...");
