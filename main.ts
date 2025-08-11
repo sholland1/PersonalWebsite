@@ -109,7 +109,8 @@ function createIndexParams(title: string, path: string, params: Array<ArticlePar
     params.sort(flip(compareByDate));
     return {
         title, path,
-        content: params.map(page => `<h4><a href="${page.path}">${page.title}</a> - ${page.date_published || page.date_updated || 'No date'}</h4>`).join('\n'),
+        content: params.map(page => `<h4><a href="${page.path}">${page.title}</a>
+<span style="white-space:nowrap">- ${page.date_published || page.date_updated || 'No date'}</span></h4>`).join('\n'),
     };
 }
 
