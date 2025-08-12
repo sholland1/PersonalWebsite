@@ -175,14 +175,14 @@ async function processAnimalPics(imageDir: string): Promise<ArticleParams> {
 
     imageTags.push(`<div class="img-container">`);
     for (const entry of imageFiles) {
-        if (entry.isFile && entry.name.endsWith('.jpg')) {
+        if (entry.isFile && entry.name.endsWith('.webp')) {
             const imagePath = `${imageDir}/${entry.name}`;
             const fileInfo = await Deno.stat(imagePath);
             if (!latestModified || fileInfo.mtime && fileInfo.mtime > latestModified) {
                 latestModified = fileInfo.mtime;
             }
 
-            const altText = entry.name.substring(3).replace('.jpg', '');
+            const altText = entry.name.substring(4).replace('.webp', '');
             imageTags.push(`<img src="${imagePath}" alt="${altText}">`);
         }
     }
